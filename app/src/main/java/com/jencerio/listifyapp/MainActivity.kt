@@ -1,5 +1,6 @@
 package com.jencerio.listifyapp
 
+import LoginScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -48,4 +50,24 @@ fun ListifyApp() {
             }
         }
     }
+}
+
+@Composable
+fun BudgetTrackingScreen() {
+    TODO("Not yet implemented")
+}
+
+@Composable
+fun OfflineScreen() {
+    TODO("Not yet implemented")
+}
+
+@Composable
+fun ForgotPasswordScreen(navController: NavHostController) {
+
+}
+
+@Composable
+fun SignupScreen(navController: NavHostController) {
+
 }

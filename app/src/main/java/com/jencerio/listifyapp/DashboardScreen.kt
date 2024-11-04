@@ -75,7 +75,7 @@ fun ProfileSection(navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_profile), // Replace with your profile image resource
+            painter = painterResource(id = R.drawable.ic_profile),
             contentDescription = "Profile Picture",
             modifier = Modifier.size(80.dp)
         )
@@ -118,7 +118,7 @@ fun ActionButtons(navController: NavHostController) {
             IconButton(
                 onClick = {
                     if (index == 0) {
-                        navController.navigate("shopping_list") // Navigate to Shopping List screen
+                        navController.navigate("shopping_list")
                     } else {
                         // Handle other actions
                     }
