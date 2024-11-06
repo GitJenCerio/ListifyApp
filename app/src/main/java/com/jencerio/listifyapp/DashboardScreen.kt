@@ -119,7 +119,11 @@ fun ActionButtons(navController: NavHostController) {
                 onClick = {
                     if (index == 0) {
                         navController.navigate("shopping_list")
-                    } else {
+                    }
+                    else if (index == 3) {
+                        navController.navigate("budget_tracking")
+                    }
+                    else {
                         // Handle other actions
                     }
                 },

@@ -46,16 +46,15 @@ fun ListifyApp() {
                 composable("signup") { SignupScreen(navController) }
                 composable("forgot_password") { ForgotPasswordScreen(navController) }
                 composable("offline") { OfflineScreen() }
-                composable("budget_tracking") { BudgetTrackingScreen() }
+                composable("budget_tracking") { BudgetTrackingScreen(
+                    navController
+                ) }
             }
         }
     }
 }
 
-@Composable
-fun BudgetTrackingScreen() {
-    TODO("Not yet implemented")
-}
+
 
 @Composable
 fun OfflineScreen() {
