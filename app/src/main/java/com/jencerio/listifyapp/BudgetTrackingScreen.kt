@@ -24,10 +24,10 @@ fun BudgetTrackingScreen(navController: NavHostController) {
     // State for tracking the list of budget items
     var budgetItems by remember { mutableStateOf(
         listOf(
-            BudgetCategory("Rent", 1200.00),
+            BudgetCategory("Meals", 1200.00),
             BudgetCategory("Groceries", 300.00),
-            BudgetCategory("Entertainment", 150.00),
-            BudgetCategory("Transportation", 100.00)
+            BudgetCategory("Snacks", 150.00),
+            BudgetCategory("Vegetables", 100.00)
         )
     )}
 
