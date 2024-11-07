@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="360in"
+    android:layout_height="803in"
+    android:background="@color/white"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/layout0"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#DEF4E1"
+        android:orientation="vertical">
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout1"
+        android:layout_width="match_parent"
+        android:layout_height="18dp"
+        android:background="#d9d9d9"
+        android:padding="16dp"
+        android:orientation="horizontal" >
+
+
+    </LinearLayout>
+
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="15dp"
+        android:src="?android:attr/alertDialogIcon" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="403dp"
+        android:layout_height="23dp"
+
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="10px"
+        android:text="Offline Mode: You are currently editing offline. Changes are currently being saved locally."
+        android:textAlignment="textStart"
+        android:textSize="9sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/editTextText2"
+        android:layout_width="168dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="110dp"
+        android:textAlignment="center"
+        android:layout_marginTop="40dp"
+        android:inputType="text"
+        android:text="New List"
+        android:textColor="#5ABC66"
+        android:textSize="24dp"
+        android:textStyle="bold"/>
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="21dp"
+        android:layout_height="17dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="240dp"
+        android:layout_marginTop="50dp"
+        app:tint="#5ABC66"
+        android:src="@android:drawable/ic_menu_edit" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="328dp"
+        android:layout_height="582dp"
+        app:cardCornerRadius="20dp"
+        android:layout_marginBottom="50dp"
+        android:layout_marginTop="80dp"
+        android:layout_marginLeft="40dp">
+
+        <LinearLayout
+            android:id="@+id/layout4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="50dp">
+
+
+            <TextView
+                android:id="@+id/textView01"
+                android:layout_width="70dp"
+                android:layout_height="20dp"
+android:textColor="#5ABC66"
+                android:layout_marginLeft="210dp"
+                android:layout_marginTop="10px"
+                android:text= "Quantity"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+        android:orientation="horizontal"
+        android:layout_marginBottom="10dp">
+
+            <CheckBox
+                android:id="@+id/checkBox2"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+
+                android:checked="true"
+                />
+
+            <EditText
+                android:id="@+id/editTextNumber3.1"
+                android:layout_width="140dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginRight="33dp"
+                android:background="@drawable/bottomborder"
+                android:ems="10"
+                android:text="Bork and Peans"
+                android:inputType="text"/>
+
+            <EditText
+            android:id="@+id/editTextNumber2"
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:layout_marginRight="20dp"
+            android:ems="10"
+            android:layout_marginTop="3dp"
+            android:inputType="number"
+
+        android:background="@drawable/border" />
+    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+
+                <CheckBox
+                    android:id="@+id/checkBox4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+
+
+
+                    android:textColor="#5abc66"
+
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+
+                    />
+                <EditText
+                    android:id="@+id/editTextNumber4.1"
+                    android:layout_width="140dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="33dp"
+                    android:background="@drawable/bottomborder"
+                    android:ems="10"
+                    android:inputType="text"/>
+                <EditText
+                    android:id="@+id/editTextNumber3"
+                    android:layout_width="60dp"
+                    android:layout_height="20dp"
+                    android:layout_marginRight="20dp"
+                    android:ems="10"
+                    android:layout_marginTop="3dp"
+                    android:inputType="number"
+
+                    android:background="@drawable/border" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+
+                <CheckBox
+                    android:id="@+id/checkBox5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+
+
+                    android:textColor="#5abc66"
+
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+
+                    />
+                <EditText
+                    android:id="@+id/editTextNumber5.1"
+                    android:layout_width="140dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="33dp"
+                    android:background="@drawable/bottomborder"
+                    android:ems="10"
+                    android:inputType="text"/>
+
+                <EditText
+                    android:id="@+id/editTextNumber4"
+                    android:layout_width="60dp"
+                    android:layout_height="20dp"
+                    android:layout_marginRight="20dp"
+                    android:ems="10"
+                    android:layout_marginTop="3dp"
+                    android:inputType="number"
+
+                    android:background="@drawable/border" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+
+                <CheckBox
+                    android:id="@+id/checkBox6"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:outlineAmbientShadowColor="#5abc66"
+
+                    android:textColor="#5abc66"
+
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:textSize="15dp"
+                    />
+                <EditText
+                    android:id="@+id/editTextNumber6.1"
+                    android:layout_width="140dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="33dp"
+                    android:background="@drawable/bottomborder"
+                    android:ems="10"
+                    android:inputType="text"/>
+
+                <EditText
+                    android:id="@+id/editTextNumber5"
+                    android:layout_width="60dp"
+                    android:layout_height="20dp"
+                    android:layout_marginRight="20dp"
+                    android:ems="10"
+                    android:layout_marginTop="3dp"
+                    android:inputType="number"
+
+                    android:background="@drawable/border" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+
+                <CheckBox
+                    android:id="@+id/checkBox3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="#5abc66"
+
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:textSize="15dp"
+                    />
+                <EditText
+                    android:id="@+id/editTextNumber2.1"
+                    android:layout_width="140dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="33dp"
+                    android:background="@drawable/bottomborder"
+                    android:ems="10"
+                    android:inputType="text"/>
+
+                <EditText
+                    android:id="@+id/editTextNumber6"
+                    android:layout_width="60dp"
+                    android:layout_height="20dp"
+                    android:layout_marginRight="20dp"
+                    android:ems="10"
+                    android:layout_marginTop="3dp"
+                    android:inputType="number"
+
+                    android:background="@drawable/border" />
+            </LinearLayout>
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="283dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="70dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/border2"
+                android:text="+ Add Item"
+                android:textStyle="bold"
+                android:textColor="#5abc66"/>
+
+
+        </LinearLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:layout_weight="2"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="43dp"
+        app:tint="#5ABC66"
+        android:src="?android:attr/actionModeCloseDrawable" />
+    <LinearLayout
+        android:layout_width="330dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="60dp"
+android:layout_marginTop="670dp"
+        android:orientation="horizontal"
+        android:layout_marginBottom="10dp">
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="30dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="60dp"
+            android:layout_weight="1"
+            android:background="@drawable/white"
+            android:text="Save"
+            android:textStyle="bold"
+            android:textColor="#5abc66"/>
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="30dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginRight="40dp"
+            android:background="@drawable/red"
+            android:text="Discard"
+            android:textStyle="bold"
+            android:textColor="#8B1113"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
