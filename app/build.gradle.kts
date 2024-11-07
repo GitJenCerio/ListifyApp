@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId = "com.jencerio.listifyapp"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -50,6 +50,11 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material)
     implementation(libs.androidx.navigation.runtime.ktx)
+    implementation ("androidx.activity:activity-compose:1.3.1")
+    implementation ("androidx.compose.ui:ui:1.0.1")
+    implementation ("androidx.compose.material3:material3:1.0.0-alpha01")
+    implementation ("androidx.appcompat:appcompat:1.7.0")
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
