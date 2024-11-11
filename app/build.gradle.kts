@@ -66,5 +66,6 @@ dependencies {
     implementation (libs.ui)
     implementation (libs.material3)
     implementation (platform(libs.androidx.compose.bom))
+    implementation("com.google.code.gson:gson:2.8.8")
 
 }

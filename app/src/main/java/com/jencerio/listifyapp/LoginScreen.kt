@@ -1,3 +1,6 @@
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -6,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -14,12 +18,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.jencerio.listifyapp.R
-
+import utility_functions.loadUsers
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -102,7 +107,15 @@ fun LoginScreen(navController: NavHostController) {
 
         // Login Button
         Button(
-            onClick = { navController.navigate("opening") },
+            onClick = {
+                val users = loadUsers(context)
+                val user = users.find { it.email == email && it.password == password }
+                if (user != null) {
+                    navController.navigate("opening")
+                } else {
+                    Toast.makeText(context, "Invalid email or password", Toast.LENGTH_SHORT).show()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth(0.9f)
                 .padding(vertical = 8.dp),
@@ -125,7 +138,6 @@ fun LoginScreen(navController: NavHostController) {
 
         // Create Account Button
         Button(
-
             onClick = { navController.navigate("signup") },
             modifier = Modifier
                 .fillMaxWidth(0.9f)

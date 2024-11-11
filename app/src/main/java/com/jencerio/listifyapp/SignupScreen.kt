@@ -1,28 +1,20 @@
 package com.jencerio.listifyapp
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.jencerio.listifyapp.R
-import android.os.Bundle
 import android.view.LayoutInflater
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.draw.scale
+import android.widget.Button
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import utility_functions.User
+import utility_functions.registerUser
+import android.content.Context
+import android.util.Log
+import android.widget.EditText
 
 
 //class SignUpScreenView : AppCompatActivity() {
@@ -34,18 +26,42 @@ import androidx.compose.ui.viewinterop.AndroidView
 
 @Composable
 fun SignupScreen(navController: NavHostController) {
-    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
-    //Import Layout Inside Page
     AndroidView(
         factory = { context ->
             LayoutInflater.from(context).inflate(R.layout.register, null)
         },
         modifier = Modifier.fillMaxSize()
-    )
+    ) { view ->
+        val registerButton: Button = view.findViewById(R.id.registerBtn)
+        registerButton.setOnClickListener {
 
+            email = view.findViewById<EditText>(R.id.email).text.toString()
+            firstName = view.findViewById<EditText>(R.id.firstname).text.toString()
+            lastName = view.findViewById<EditText>(R.id.lastname).text.toString()
+            password = view.findViewById<EditText>(R.id.password).text.toString()
+            confirmPassword = view.findViewById<EditText>(R.id.repeat_password).text.toString()
+
+            Log.d("SignupScreen", "Email: $email, FirstName: $firstName, LastName: $lastName, Password: $password, ConfirmPassword: $confirmPassword")
+
+            if (email.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                Toast.makeText(context, "Please fill out all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (password == confirmPassword) {
+                val newUser = User(email, password, firstName, lastName)
+                registerUser(context, newUser)
+                navController.navigate("login")
+            } else {
+                Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 }
