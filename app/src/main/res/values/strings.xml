@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">ListifyApp</string>
+    <string name="grocery_planning_made_simple">\"Grocery Planning, Made Simple\"</string>
+    <string name="image_of_a_person">Image of a person</string>
+    <string name="username">Username</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="lgnBtn">Login</string>
+    <string name="forgotPassword">Forgot Password?</string>
+    <string name="register">Create Account</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="confirmPw">Confirm Password</string>
+    <string name="signUp">Sign Up</string>
+    <string name="forgetPw_header">Forgot Password</string>
+    <string name="forgetPw_text">Enter your email address and we will send you a link to reset your password</string>
+    <string name="sendEmail">Send Email</string>
+    <string name="firstName">First Name</string>
+    <string name="lastName">Last Name</string>
 </resources>
