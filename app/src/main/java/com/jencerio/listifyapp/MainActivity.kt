@@ -47,19 +47,9 @@ fun ListifyApp() {
                 composable("shopping_list") { ShoppingListScreen(navController, shoppingListViewModel) }
                 composable("signup") { SignupScreen(navController) }
                 composable("forgot_password") { ForgotPasswordScreen(navController) }
-                composable("offline") { OfflineScreen() }
-                composable("budget_tracking") { BudgetTrackingScreen(
-                    navController
-                ) }
+                composable("budget_tracking") { BudgetTrackingScreen(navController) }
+
             }
         }
     }
 }
-
-
-
-@Composable
-fun OfflineScreen() {
-    TODO("Not yet implemented")
-}
-

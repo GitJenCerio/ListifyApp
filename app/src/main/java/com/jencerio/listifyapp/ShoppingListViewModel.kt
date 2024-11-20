@@ -3,7 +3,12 @@ package com.jencerio.listifyapp
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 
-data class ShoppingItem(val name: String, val quantity: Int)
+data class ShoppingItem(
+    val name: String,
+    val quantity: Int,
+    val unit: String
+)
+
 data class ShoppingList(val name: String, val items: List<ShoppingItem>)
 
 class ShoppingListViewModel : ViewModel() {
@@ -24,3 +29,4 @@ class ShoppingListViewModel : ViewModel() {
         shoppingLists.remove(list)
     }
 }
+

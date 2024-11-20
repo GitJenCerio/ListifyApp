@@ -3,16 +3,19 @@ package com.jencerio.listifyapp
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -87,12 +90,15 @@ fun EditShoppingListDialog(
     var listItems by remember { mutableStateOf(shoppingList.items.map { it.copy() }.toMutableList()) }
     var newItemName by remember { mutableStateOf("") }
     var newItemQuantity by remember { mutableStateOf("") }
+    var newItemUnit by remember { mutableStateOf(units.first()) }
+    var newItemUnitExpanded by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp)
+                .heightIn(min = 600.dp, max = 700.dp), // Adjust dialog height
             shape = MaterialTheme.shapes.medium,
             color = Color.White
         ) {
@@ -103,10 +109,9 @@ fun EditShoppingListDialog(
                 Text(
                     text = "Edit Shopping List",
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50)),
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 10.dp)
                 )
 
-                // Editable text field for list name
                 OutlinedTextField(
                     value = listName,
                     onValueChange = { listName = it },
@@ -116,103 +121,140 @@ fun EditShoppingListDialog(
                         .padding(bottom = 8.dp)
                 )
 
-                // List of items with editable quantity fields
-                listItems.forEachIndexed { index, item ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    ) {
-                        // Item name
-                        Text(
-                            text = item.name,
-                            modifier = Modifier.weight(1f),
-                            style = TextStyle(fontSize = 16.sp, color = Color.Black)
-                        )
+                // Editable items
+                LazyColumn {
+                    itemsIndexed(listItems) { index, item ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = item.name,
+                                modifier = Modifier.weight(1f),
+                                style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            )
 
-                        // Editable quantity field
-                        OutlinedTextField(
-                            value = item.quantity.takeIf { it > 0 }?.toString() ?: "",
-                            onValueChange = { newQuantity ->
-                                listItems = listItems.toMutableList().apply {
-                                    if (newQuantity.isBlank()) {
-                                        set(index, item.copy(quantity = 0))
-                                    } else {
-                                        val quantity = newQuantity.toIntOrNull() ?: item.quantity
-                                        set(index, item.copy(quantity = quantity))
+                            OutlinedTextField(
+                                value = item.quantity.takeIf { it > 0 }?.toString() ?: "",
+                                onValueChange = { newQuantity ->
+                                    val parsedQuantity = newQuantity.toIntOrNull() ?: 0
+                                    listItems[index] = item.copy(quantity = parsedQuantity)
+                                },
+                                label = { Text("Qty") },
+                                modifier = Modifier
+                                    .width(60.dp)
+                                    .padding(end = 8.dp),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            )
+
+                            Box(modifier = Modifier.width(120.dp)) {
+                                OutlinedTextField(
+                                    value = item.unit,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text("Unit") },
+                                    trailingIcon = {
+                                        IconButton(onClick = { /* Handle unit selection */ }) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.ic_arrow_drop_down),
+                                                contentDescription = "Select unit"
+                                            )
+                                        }
                                     }
-                                }
-                            },
-                            label = { Text("Qty") },
-                            modifier = Modifier.width(80.dp),
-                            singleLine = true,
-                            textStyle = TextStyle(color = Color.Black),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                        )
+                                )
+                            }
+                        }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Section for adding a new item
-                Text("Add New Item", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF4CAF50))
+                // Add new item section
+                Text(
+                    text = "Add New Item",
+                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50)),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
 
-                // New Item Name field
                 OutlinedTextField(
                     value = newItemName,
                     onValueChange = { newItemName = it },
                     label = { Text("Item Name") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
                 )
 
-                // New Item Quantity field
                 OutlinedTextField(
                     value = newItemQuantity,
                     onValueChange = { newItemQuantity = it },
                     label = { Text("Quantity") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    textStyle = TextStyle(color = Color.Black)
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
-                // Add Button
+                Box(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
+                    OutlinedTextField(
+                        value = newItemUnit,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Unit") },
+                        trailingIcon = {
+                            IconButton(onClick = { newItemUnitExpanded = !newItemUnitExpanded }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_arrow_drop_down),
+                                    contentDescription = "Select unit"
+                                )
+                            }
+                        }
+                    )
+
+                    DropdownMenu(
+                        expanded = newItemUnitExpanded,
+                        onDismissRequest = { newItemUnitExpanded = false }
+                    ) {
+                        units.forEach { unit ->
+                            DropdownMenuItem(
+                                text = { Text(unit) },
+                                onClick = {
+                                    newItemUnit = unit
+                                    newItemUnitExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
                 Button(
                     onClick = {
-                        val quantity = newItemQuantity.toIntOrNull() ?: 0
-                        if (newItemName.isNotBlank()) {
-                            listItems.add(ShoppingItem(newItemName, quantity))
+                        if (newItemName.isNotBlank() && newItemQuantity.toIntOrNull() != null) {
+                            listItems.add(
+                                ShoppingItem(
+                                    name = newItemName,
+                                    quantity = newItemQuantity.toInt(),
+                                    unit = newItemUnit
+                                )
+                            )
                             newItemName = ""
                             newItemQuantity = ""
+                            newItemUnit = units.first()
                         }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Add Item")
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
+                // Save and Cancel buttons
                 Row(
                     horizontalArrangement = Arrangement.End,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
                 ) {
                     TextButton(onClick = onDismiss) {
                         Text("Cancel")
                     }
-                    Button(
-                        onClick = {
-                            val updatedItems = listItems.filter { it.quantity > 0 }
-                            onSave(listName, updatedItems)
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50), contentColor = Color.White)
-                    ) {
+                    Button(onClick = { onSave(listName, listItems) }) {
                         Text("Save")
                     }
                 }

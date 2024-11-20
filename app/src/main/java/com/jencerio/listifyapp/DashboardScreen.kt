@@ -7,6 +7,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +24,8 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun DashboardScreen(navController: NavHostController, shoppingListViewModel: ShoppingListViewModel) {
+    var isOffline by remember { mutableStateOf(false) } // Track offline mode
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -27,12 +33,38 @@ fun DashboardScreen(navController: NavHostController, shoppingListViewModel: Sho
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ProfileSection(navController)
+        // Show offline banner if offline mode is enabled
+        if (isOffline) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFFFA000)) // Amber color for visibility
+                    .padding(12.dp)
+            ) {
+                Text(
+                    text = "You are in offline mode. Syncing is disabled. Changes will sync once online.",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        ProfileSection(navController, isOffline) { isOffline = it } // Pass state management
         Spacer(modifier = Modifier.height(16.dp))
         ActionButtons(navController)
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("SHOPPING LIST", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))
+        Text(
+            text = "SHOPPING LIST",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF4CAF50),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
         LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             if (shoppingListViewModel.shoppingLists.isEmpty()) {
@@ -41,15 +73,18 @@ fun DashboardScreen(navController: NavHostController, shoppingListViewModel: Sho
                         text = "You have no shopping lists yet.",
                         color = Color.Gray,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth().padding(8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
                     )
                 }
             } else {
-                items(shoppingListViewModel.shoppingLists) { list ->
-                    Text(list.name, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.Black, modifier = Modifier.padding(vertical = 4.dp))
-                    list.items.forEach { item ->
-                        Text("- ${item.name} (x${item.quantity})", fontSize = 14.sp, color = Color.Gray, modifier = Modifier.padding(start = 16.dp, bottom = 4.dp))
-                    }
+                items(shoppingListViewModel.shoppingLists) { shoppingList ->
+                    ShoppingListItem(
+                        shoppingList = shoppingList,
+                        onEdit = { /* Navigate to edit functionality */ },
+                        onDelete = { shoppingListViewModel.removeShoppingList(shoppingList) }
+                    )
                 }
             }
         }
@@ -66,7 +101,7 @@ fun DashboardScreen(navController: NavHostController, shoppingListViewModel: Sho
 }
 
 @Composable
-fun ProfileSection(navController: NavHostController) {
+fun ProfileSection(navController: NavHostController, isOffline: Boolean, onOfflineToggle: (Boolean) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -74,6 +109,7 @@ fun ProfileSection(navController: NavHostController) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Profile Image and Greeting
         Image(
             painter = painterResource(id = R.drawable.ic_profile),
             contentDescription = "Profile Picture",
@@ -88,6 +124,32 @@ fun ProfileSection(navController: NavHostController) {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Offline Mode Toggle
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = if (isOffline) "Offline Mode Enabled" else "Online Mode",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Switch(
+                checked = isOffline,
+                onCheckedChange = { onOfflineToggle(it) },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White,
+                    uncheckedThumbColor = Color.LightGray,
+                    checkedTrackColor = Color(0xFFFFA000), // Amber when enabled
+                    uncheckedTrackColor = Color.Gray
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         // Set Shopping Reminders button
         Button(
             onClick = { navController.navigate("set_reminder") },
@@ -98,7 +160,6 @@ fun ProfileSection(navController: NavHostController) {
         }
     }
 }
-
 @Composable
 fun ActionButtons(navController: NavHostController) {
     Row(
