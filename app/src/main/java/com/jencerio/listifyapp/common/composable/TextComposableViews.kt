@@ -1,16 +1,15 @@
-package com.jodhpurtechies.composelogin.ui.common.customComposableViews
+package com.jencerio.listifyapp.common.composable
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 
-@Composable
+@androidx.compose.runtime.Composable
 fun TitleText(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.Companion,
     text: String,
-    textAlign: TextAlign = TextAlign.Start
+    textAlign: TextAlign = TextAlign.Companion.Start
 ) {
     Text(
         modifier = modifier,
@@ -21,11 +20,11 @@ fun TitleText(
     )
 }
 
-@Composable
+@androidx.compose.runtime.Composable
 fun MediumTitleText(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.Companion,
     text: String,
-    textAlign: TextAlign = TextAlign.Start
+    textAlign: TextAlign = TextAlign.Companion.Start
 ) {
     Text(
         modifier = modifier,
@@ -36,9 +35,9 @@ fun MediumTitleText(
     )
 }
 
-@Composable
+@androidx.compose.runtime.Composable
 fun ErrorTextInputField(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.Companion,
     text: String
 ) {
     Text(

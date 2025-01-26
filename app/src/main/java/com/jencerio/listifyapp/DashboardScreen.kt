@@ -1,5 +1,6 @@
 package com.jencerio.listifyapp
 
+import LoginScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,9 +19,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun DashboardScreen(navController: NavHostController, shoppingListViewModel: ShoppingListViewModel) {
@@ -54,8 +58,6 @@ fun DashboardScreen(navController: NavHostController, shoppingListViewModel: Sho
         }
 
         ProfileSection(navController, isOffline) { isOffline = it } // Pass state management
-        Spacer(modifier = Modifier.height(16.dp))
-        ActionButtons(navController)
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
@@ -97,6 +99,9 @@ fun DashboardScreen(navController: NavHostController, shoppingListViewModel: Sho
         ) {
             Text("Add New List")
         }
+
+        ActionButtons(navController)
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
@@ -123,30 +128,6 @@ fun ProfileSection(navController: NavHostController, isOffline: Boolean, onOffli
             fontSize = 24.sp
         )
         Spacer(modifier = Modifier.height(8.dp))
-
-        // Offline Mode Toggle
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = if (isOffline) "Offline Mode Enabled" else "Online Mode",
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Switch(
-                checked = isOffline,
-                onCheckedChange = { onOfflineToggle(it) },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
-                    uncheckedThumbColor = Color.LightGray,
-                    checkedTrackColor = Color(0xFFFFA000), // Amber when enabled
-                    uncheckedTrackColor = Color.Gray
-                )
-            )
-        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -264,4 +245,17 @@ fun ShoppingListItem(
             }
         }
     }
+}
+
+
+@Preview
+@Composable
+fun PreviewDashboardScreen() {
+    val navController = rememberNavController()
+    val shoppingListViewModel = ShoppingListViewModel()
+
+    DashboardScreen(
+        navController = navController,
+        shoppingListViewModel = shoppingListViewModel
+    )
 }

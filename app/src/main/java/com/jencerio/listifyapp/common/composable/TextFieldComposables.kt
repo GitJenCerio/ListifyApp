@@ -1,44 +1,36 @@
-package com.jodhpurtechies.composelogin.ui.common.customComposableViews
+package com.jencerio.listifyapp.common.composable
 
-import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import com.jodhpurtechies.composelogin.R
+import androidx.compose.ui.tooling.preview.Preview
+import com.jencerio.listifyapp.R
+import com.jencerio.listifyapp.ui.theme.primary
 
-/**
- * Password Text Field
- */
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordTextField(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.Companion,
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
     isError: Boolean = false,
     errorText: String = "",
-    imeAction: ImeAction = ImeAction.Done
+    imeAction: ImeAction = ImeAction.Companion.Done
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val keyboardController = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
 
-    var isPasswordVisible by remember {
-        mutableStateOf(false)
+    var isPasswordVisible by androidx.compose.runtime.remember {
+        androidx.compose.runtime.mutableStateOf(false)
     }
 
     OutlinedTextField(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         value = value,
         onValueChange = onValueChange,
         label = {
@@ -49,33 +41,33 @@ fun PasswordTextField(
                 isPasswordVisible = !isPasswordVisible
             }) {
 
-                val visibleIconAndText = Pair(
-                    first = Icons.Outlined.Visibility,
-                    second = stringResource(id = R.string.icon_password_visible)
+                val visibleIconAndText = kotlin.Pair(
+                    first = androidx.compose.material.icons.Icons.Outlined.Visibility,
+                    second = androidx.compose.ui.res.stringResource(id =R.string.icon_password_visible )
                 )
 
-                val hiddenIconAndText = Pair(
-                    first = Icons.Outlined.VisibilityOff,
-                    second = stringResource(id = R.string.icon_password_hidden)
+                val hiddenIconAndText = kotlin.Pair(
+                    first = androidx.compose.material.icons.Icons.Outlined.VisibilityOff,
+                    second = androidx.compose.ui.res.stringResource(id = R.string.icon_password_hidden)
                 )
 
                 val passwordVisibilityIconAndText =
                     if (isPasswordVisible) visibleIconAndText else hiddenIconAndText
 
                 // Render Icon
-                Icon(
+                androidx.compose.material3.Icon(
                     imageVector = passwordVisibilityIconAndText.first,
                     contentDescription = passwordVisibilityIconAndText.second
                 )
             }
         },
         singleLine = true,
-        visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        visualTransformation = if (isPasswordVisible) androidx.compose.ui.text.input.VisualTransformation.Companion.None else androidx.compose.ui.text.input.PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
+            keyboardType = KeyboardType.Companion.Password,
             imeAction = imeAction
         ),
-        keyboardActions = KeyboardActions(onDone = {
+        keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = {
             keyboardController?.hide()
         }),
         isError = isError,
@@ -101,9 +93,8 @@ fun EmailTextField(
     errorText: String = "",
     imeAction: ImeAction = ImeAction.Next
 ) {
-
     OutlinedTextField(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(), // This ensures the text field fills the width
         value = value,
         onValueChange = onValueChange,
         label = {
@@ -121,7 +112,6 @@ fun EmailTextField(
             }
         }
     )
-
 }
 
 /**
@@ -159,4 +149,36 @@ fun MobileNumberTextField(
         }
     )
 
+}
+
+@Preview
+@Composable
+fun PreviewEmailTextField() {
+    Surface(
+        color = primary // Set the background color for the preview
+    ) {
+        EmailTextField(
+            value = "",
+            onValueChange = {},
+            label = "Email",
+            isError = false,
+            errorText = ""
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewPasswordTextField() {
+    Surface(
+        color = primary // Set the background color for the preview
+    ) {
+        PasswordTextField(
+            value = "",
+            onValueChange = {},
+            label = "Password",
+            isError = false,
+            errorText = "",
+        )
+    }
 }
