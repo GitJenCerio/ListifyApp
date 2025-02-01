@@ -30,7 +30,6 @@ import java.nio.file.WatchEvent
 fun LoginScreen(navController: NavHostController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier

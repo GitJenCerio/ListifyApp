@@ -28,82 +28,110 @@ import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun DashboardScreen(navController: NavHostController, shoppingListViewModel: ShoppingListViewModel) {
-    var isOffline by remember { mutableStateOf(false) } // Track offline mode
+    var isOffline by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Show offline banner if offline mode is enabled
-        if (isOffline) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFFFA000)) // Amber color for visibility
-                    .padding(12.dp)
+    Scaffold(
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "You are in offline mode. Syncing is disabled. Changes will sync once online.",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        ProfileSection(navController, isOffline) { isOffline = it } // Pass state management
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "SHOPPING LIST",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF4CAF50),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-            if (shoppingListViewModel.shoppingLists.isEmpty()) {
-                item {
-                    Text(
-                        text = "You have no shopping lists yet.",
-                        color = Color.Gray,
-                        textAlign = TextAlign.Center,
+                if (isOffline) {
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp)
-                    )
+                            .background(Color(0xFFFFA000))
+                            .padding(12.dp)
+                    ) {
+                        Text(
+                            text = "You are in offline mode. Syncing is disabled. Changes will sync once online.",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-            } else {
-                items(shoppingListViewModel.shoppingLists) { shoppingList ->
-                    ShoppingListItem(
-                        shoppingList = shoppingList,
-                        onEdit = { /* Navigate to edit functionality */ },
-                        onDelete = { shoppingListViewModel.removeShoppingList(shoppingList) }
-                    )
+
+                ProfileSection(navController, isOffline) { isOffline = it }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "SHOPPING LIST",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF4CAF50),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                    if (shoppingListViewModel.shoppingLists.isEmpty()) {
+                        item {
+                            Text(
+                                text = "You have no shopping lists yet.",
+                                color = Color.Gray,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                            )
+                        }
+                    } else {
+                        items(shoppingListViewModel.shoppingLists) { shoppingList ->
+                            ShoppingListItem(
+                                shoppingList = shoppingList,
+                                onEdit = { /* Navigate to edit functionality */ },
+                                onDelete = { shoppingListViewModel.removeShoppingList(shoppingList) }
+                            )
+                        }
+                    }
                 }
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = { navController.navigate("new_list") },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
-        ) {
-            Text("Add New List")
-        }
-
-        ActionButtons(navController)
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
+
+@Composable
+fun BottomNavigationBar(navController: NavController) {
+    BottomAppBar(
+        modifier = Modifier.fillMaxWidth(),
+        containerColor = Color(0xFF4CAF50) // Green color for the bottom bar
+    ) {
+        val navItems = listOf(
+            Pair(R.drawable.baseline_home_24, "dashboard"),
+            Pair(R.drawable.baseline_edit_document_24, "shopping_list"),
+            Pair(R.drawable.baseline_favorite_24, "favorites"),
+            Pair(R.drawable.baseline_inventory_24, "pantry_inventory_management"),
+            Pair(R.drawable.baseline_attach_money_24, "budget_tracking")
+        )
+
+        navItems.forEach { (icon, route) ->
+            IconButton(
+                onClick = { navController.navigate(route) },
+                modifier = Modifier.weight(1f) // Even spacing
+            ) {
+                Icon(
+                    painter = painterResource(id = icon),
+                    contentDescription = route,
+                    tint = Color.White,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        }
+    }
+}
+
+
 
 @Composable
 fun ProfileSection(navController: NavHostController, isOffline: Boolean, onOfflineToggle: (Boolean) -> Unit) {
@@ -248,14 +276,24 @@ fun ShoppingListItem(
 }
 
 
+//@Preview
+//@Composable
+//fun PreviewDashboardScreen() {
+//    val navController = rememberNavController()
+//    val shoppingListViewModel = ShoppingListViewModel()
+//
+//    DashboardScreen(
+//        navController = navController,
+//        shoppingListViewModel = shoppingListViewModel
+//    )
+//}
+
 @Preview
 @Composable
 fun PreviewDashboardScreen() {
     val navController = rememberNavController()
-    val shoppingListViewModel = ShoppingListViewModel()
 
-    DashboardScreen(
+    BottomNavigationBar(
         navController = navController,
-        shoppingListViewModel = shoppingListViewModel
     )
 }
