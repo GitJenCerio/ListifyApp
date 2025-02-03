@@ -96,7 +96,7 @@ fun FavoriteItemRow(item: String, onRemove: () -> Unit) {
             Text(
                 text = "Remove",
                 fontSize = 14.sp,
-                color = Color(0xFF1B5E20), // Darkest Green
+                color = Color(0xFF1B5E20), // Dark Green
                 modifier = Modifier.clickable { onRemove() }
             )
         }
