@@ -1,6 +1,6 @@
 package com.jencerio.listifyapp
 
-import LoginScreen
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +26,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun DashboardScreen(navController: NavHostController, shoppingListViewModel: ShoppingListViewModel) {
@@ -135,6 +138,43 @@ fun BottomNavigationBar(navController: NavController) {
 
 @Composable
 fun ProfileSection(navController: NavHostController, isOffline: Boolean, onOfflineToggle: (Boolean) -> Unit) {
+    // Get the current user's UID
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+    // Firestore instance
+    val firestore = FirebaseFirestore.getInstance()
+
+    // State to hold the first name and last name
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(true) } // To show loading initially
+
+    // Fetch user data from Firestore
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            firestore.collection("users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot.exists()) {
+                        // Get data from Firestore and update the state
+                        firstName = documentSnapshot.getString("firstName") ?: "First Name"
+                        lastName = documentSnapshot.getString("lastName") ?: "Last Name"
+                    }
+                    isLoading = false // Hide loading after fetching the data
+                }
+                .addOnFailureListener { exception ->
+                    Log.w("ProfileSection", "Error fetching user data", exception)
+                    isLoading = false // Hide loading in case of error
+                }
+        }
+    }
+
+    // If data is still loading, show a loading indicator
+    if (isLoading) {
+        CircularProgressIndicator(color = Color.White)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -149,8 +189,10 @@ fun ProfileSection(navController: NavHostController, isOffline: Boolean, onOffli
             modifier = Modifier.size(80.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
+
+        // Greeting with first and last name from Firestore
         Text(
-            text = "Hi Jane Doe!",
+            text = "Hi $firstName $lastName!",
             fontWeight = FontWeight.Bold,
             color = Color.White,
             fontSize = 24.sp
@@ -276,17 +318,6 @@ fun ShoppingListItem(
 }
 
 
-//@Preview
-//@Composable
-//fun PreviewDashboardScreen() {
-//    val navController = rememberNavController()
-//    val shoppingListViewModel = ShoppingListViewModel()
-//
-//    DashboardScreen(
-//        navController = navController,
-//        shoppingListViewModel = shoppingListViewModel
-//    )
-//}
 
 @Preview
 @Composable

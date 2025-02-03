@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -38,7 +39,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.2" // Ensure compatibility with your Compose version
+        kotlinCompilerExtensionVersion = "1.5.2"
     }
 }
 
@@ -62,12 +63,17 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
 
     // Appcompat
-    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation(libs.androidx.appcompat)
 
     // Gson (for JSON parsing, if needed)
-    implementation("com.google.code.gson:gson:2.8.8")
+    implementation(libs.gson)
     implementation(libs.engage.core)
     implementation(libs.androidx.tools.core)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
+
 
     // Testing dependencies
     testImplementation(libs.junit)
@@ -76,7 +82,7 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
-    implementation ("androidx.compose.material:material-icons-extended")
+    implementation (libs.androidx.material.icons.extended)
 
 
 
@@ -84,4 +90,13 @@ dependencies {
     // Debugging and tooling
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation (libs.play.services.auth) // Google Sign-In SDK
+    implementation (libs.firebase.auth)  // Firebase Authentication
+    implementation (libs.androidx.activity.ktx.v131)
+    implementation ("androidx.compose.runtime:runtime:1.7.7")  // Make sure Compose runtime is up to date
+
+
+
+
+
 }

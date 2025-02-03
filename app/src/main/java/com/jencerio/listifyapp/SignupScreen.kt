@@ -8,22 +8,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import utility_functions.User
-import utility_functions.registerUser
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import com.jencerio.listifyapp.ui.theme.greenDark
-import com.jencerio.listifyapp.ui.theme.greenDarker
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.navigation.NavHostController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.jencerio.listifyapp.ui.theme.greenDark
+import com.jencerio.listifyapp.ui.theme.greenDarker
 import java.util.regex.Pattern
 
 @Composable
@@ -34,6 +33,8 @@ fun SignupScreen(navController: NavHostController) {
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
+    val firestore = FirebaseFirestore.getInstance()
 
     // Helper for error states
     var emailError by remember { mutableStateOf(false) }
@@ -160,9 +161,30 @@ fun SignupScreen(navController: NavHostController) {
                 validateFields()  // Check validation before submitting
                 if (!emailError && !firstNameError && !lastNameError && !passwordError && !confirmPasswordError) {
                     if (password == confirmPassword) {
-                        val newUser = User(email, password, firstName, lastName)
-                        registerUser(context, newUser)
-                        navController.navigate("login")
+                        auth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    // Save additional user info to Firestore
+                                    val user = auth.currentUser
+                                    val userData = hashMapOf(
+                                        "firstName" to firstName,
+                                        "lastName" to lastName,
+                                        "email" to email
+                                    )
+                                    firestore.collection("users")
+                                        .document(user?.uid ?: "")
+                                        .set(userData)
+                                        .addOnSuccessListener {
+                                            Toast.makeText(context, "User created successfully", Toast.LENGTH_SHORT).show()
+                                            navController.navigate("login")
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Toast.makeText(context, "Error saving user data", Toast.LENGTH_SHORT).show()
+                                        }
+                                } else {
+                                    Toast.makeText(context, "Signup failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            }
                     } else {
                         Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
                     }
