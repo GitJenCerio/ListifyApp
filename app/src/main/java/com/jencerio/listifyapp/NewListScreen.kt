@@ -1,12 +1,20 @@
 package com.jencerio.listifyapp
 
+import android.app.Activity
+import android.os.Build
+import android.view.WindowInsets
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -14,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.DpOffset
 import androidx.navigation.NavHostController
+import androidx.compose.ui.focus.FocusRequester
 
 val units = listOf("pcs", "kg", "g", "l", "ml", "pack", "dozen")
 
@@ -25,6 +34,17 @@ fun AddNewListScreen(navController: NavHostController, shoppingListViewModel: Sh
     var newItemUnit by remember { mutableStateOf(units.first()) }
     val items = remember { mutableStateListOf<ShoppingItem>() }
     var unitExpanded by remember { mutableStateOf(false) }
+
+    // Get the keyboard controller to manage showing the keyboard
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester = remember { FocusRequester() }
+
+    // Ensure the keyboard appears and hide the system toolbar
+    val context = LocalContext.current
+    val window = (context as Activity).window
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        window.insetsController?.hide(WindowInsets.Type.systemBars())
+    }
 
     Column(
         modifier = Modifier
@@ -40,25 +60,54 @@ fun AddNewListScreen(navController: NavHostController, shoppingListViewModel: Sh
             color = Color(0xFF4CAF50)
         )
 
+        // List Name input field with focus request
         OutlinedTextField(
             value = listName,
             onValueChange = { listName = it },
             label = { Text("List Name") },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+                .focusRequester(focusRequester) // Add focusRequester
+                .onFocusChanged { focusState ->
+                    if (focusState.isFocused) {
+                        keyboardController?.show()
+                    }
+                }
         )
 
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus() // Request focus when screen loads
+        }
+
+        // Item Name input field
         OutlinedTextField(
             value = newItemName,
             onValueChange = { newItemName = it },
             label = { Text("Item Name") },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+                .onFocusChanged { focusState ->
+                    if (focusState.isFocused) {
+                        keyboardController?.show()
+                    }
+                }
         )
 
+        // Quantity input field (keyboard type number)
         OutlinedTextField(
             value = newItemQuantity,
             onValueChange = { newItemQuantity = it },
             label = { Text("Quantity") },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+                .onFocusChanged { focusState ->
+                    if (focusState.isFocused) {
+                        keyboardController?.show()
+                    }
+                },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
         )
 

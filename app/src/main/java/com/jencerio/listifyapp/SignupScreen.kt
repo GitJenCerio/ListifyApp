@@ -1,28 +1,30 @@
 package com.jencerio.listifyapp
 
+import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
-import android.view.LayoutInflater
-import android.widget.Button
-import android.widget.Toast
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import utility_functions.User
 import utility_functions.registerUser
-import android.content.Context
-import android.util.Log
-import android.widget.EditText
-
-
-//class SignUpScreenView : AppCompatActivity() {
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContentView(R.layout.register)
-//    }
-//}
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import com.jencerio.listifyapp.ui.theme.greenDark
+import com.jencerio.listifyapp.ui.theme.greenDarker
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import java.util.regex.Pattern
 
 @Composable
 fun SignupScreen(navController: NavHostController) {
@@ -33,35 +35,158 @@ fun SignupScreen(navController: NavHostController) {
     var confirmPassword by remember { mutableStateOf("") }
     val context = LocalContext.current
 
-    AndroidView(
-        factory = { context ->
-            LayoutInflater.from(context).inflate(R.layout.register, null)
-        },
-        modifier = Modifier.fillMaxSize()
-    ) { view ->
-        val registerButton: Button = view.findViewById(R.id.registerBtn)
-        registerButton.setOnClickListener {
+    // Helper for error states
+    var emailError by remember { mutableStateOf(false) }
+    var firstNameError by remember { mutableStateOf(false) }
+    var lastNameError by remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
+    var confirmPasswordError by remember { mutableStateOf(false) }
 
-            email = view.findViewById<EditText>(R.id.email).text.toString()
-            firstName = view.findViewById<EditText>(R.id.firstname).text.toString()
-            lastName = view.findViewById<EditText>(R.id.lastname).text.toString()
-            password = view.findViewById<EditText>(R.id.password).text.toString()
-            confirmPassword = view.findViewById<EditText>(R.id.repeat_password).text.toString()
+    // Regex pattern for email validation
+    val emailPattern = Pattern.compile(
+        "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+    )
 
-            Log.d("SignupScreen", "Email: $email, FirstName: $firstName, LastName: $lastName, Password: $password, ConfirmPassword: $confirmPassword")
+    // Update error states based on validation
+    fun validateFields() {
+        emailError = !emailPattern.matcher(email).matches() // Email validation
+        firstNameError = firstName.isEmpty()
+        lastNameError = lastName.isEmpty()
+        passwordError = password.length < 8 // Password length validation
+        confirmPasswordError = confirmPassword.isEmpty() || confirmPassword != password
+    }
 
-            if (email.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(context, "Please fill out all fields", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+    // FocusRequester and KeyboardController
+    val emailFocusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-            if (password == confirmPassword) {
-                val newUser = User(email, password, firstName, lastName)
-                registerUser(context, newUser)
-                navController.navigate("login")
-            } else {
-                Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
-            }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Logo
+        Image(
+            painter = painterResource(id = R.drawable.ic_logo),
+            contentDescription = "Logo",
+            modifier = Modifier.size(100.dp)
+        )
+
+        // Tagline
+        Text(
+            text = "Create Your Account",
+            style = TextStyle(
+                fontSize = 16.sp,
+                color = Color.Gray
+            ),
+            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+        )
+
+        // Signup title
+        Text(
+            text = "Sign Up",
+            style = TextStyle(
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF4CAF50) // Green theme
+            ),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        // Email input
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(emailFocusRequester),
+            isError = emailError
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // First Name input
+        OutlinedTextField(
+            value = firstName,
+            onValueChange = { firstName = it },
+            label = { Text("First Name") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = firstNameError
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Last Name input
+        OutlinedTextField(
+            value = lastName,
+            onValueChange = { lastName = it },
+            label = { Text("Last Name") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = lastNameError
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Password input
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            isError = passwordError
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Confirm Password input
+        OutlinedTextField(
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = { Text("Confirm Password") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            isError = confirmPasswordError
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Sign up Button
+        Button(
+            onClick = {
+                validateFields()  // Check validation before submitting
+                if (!emailError && !firstNameError && !lastNameError && !passwordError && !confirmPasswordError) {
+                    if (password == confirmPassword) {
+                        val newUser = User(email, password, firstName, lastName)
+                        registerUser(context, newUser)
+                        navController.navigate("login")
+                    } else {
+                        Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(context, "Please fill out all fields correctly", Toast.LENGTH_SHORT).show()
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = greenDark)
+        ) {
+            Text("Sign Up", color = Color.White)
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Already have an account link
+        TextButton(onClick = { navController.navigate("login") }) {
+            Text("Already have an account? Log in", color = greenDarker)
+        }
+    }
+
+    // Request focus when the screen is launched
+    LaunchedEffect(Unit) {
+        emailFocusRequester.requestFocus()
+        keyboardController?.show() // Show keyboard when the screen is launched
     }
 }

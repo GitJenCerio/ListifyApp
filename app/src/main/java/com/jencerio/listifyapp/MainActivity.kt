@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -54,8 +53,7 @@ fun ListifyApp() {
                 composable("opening") { OpeningScreen(navController) }
                 composable("dashboard") { DashboardScreen(navController, shoppingListViewModel) }
                 composable("new_list") { AddNewListScreen(navController, shoppingListViewModel) }
-                composable("shopping_list") {
-                    ShoppingListScreen(navController, shoppingListViewModel)
+                composable("shopping_list") { ShoppingListScreen(navController, shoppingListViewModel)
                 }
                 composable("budget_tracking") { BudgetTrackingScreen(navController) }
             }

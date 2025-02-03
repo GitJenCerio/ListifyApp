@@ -67,6 +67,7 @@ dependencies {
     // Gson (for JSON parsing, if needed)
     implementation("com.google.code.gson:gson:2.8.8")
     implementation(libs.engage.core)
+    implementation(libs.androidx.tools.core)
 
     // Testing dependencies
     testImplementation(libs.junit)

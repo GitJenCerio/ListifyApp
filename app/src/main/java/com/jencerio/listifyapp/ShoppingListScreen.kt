@@ -5,6 +5,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,7 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
+import com.jencerio.listifyapp.ui.theme.GreenSecondary
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShoppingListScreen(
     navController: NavHostController,
@@ -28,45 +34,78 @@ fun ShoppingListScreen(
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var selectedShoppingList by remember { mutableStateOf<ShoppingList?>(null) }
+    var showAddListDialog by remember { mutableStateOf(false) } // State for Add List dialog
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Your Shopping Lists",
-            style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50)),
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        if (shoppingListViewModel.shoppingLists.isEmpty()) {
-            Text(
-                text = "No shopping lists created yet.",
-                color = Color.Gray,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                textAlign = TextAlign.Center
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Your Shopping Lists", color = Color.White, fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(GreenSecondary),
             )
-        } else {
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(shoppingListViewModel.shoppingLists) { shoppingList ->
-                    ShoppingListItem(
-                        shoppingList = shoppingList,
-                        onEdit = {
-                            selectedShoppingList = shoppingList
-                            showDialog = true
-                        },
-                        onDelete = {
-                            shoppingListViewModel.removeShoppingList(shoppingList)
-                        }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    // Navigate to AddNewListScreen
+                    navController.navigate("new_list")
+                },
+                content = {
+                    Icon(Icons.Filled.Add, contentDescription = "Add Shopping List")
+                }
+            )
+        },
+        floatingActionButtonPosition = FabPosition.End,
+        content = { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+
+                if (shoppingListViewModel.shoppingLists.isEmpty()) {
+                    Text(
+                        text = "No shopping lists created yet.",
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        textAlign = TextAlign.Center
                     )
+                } else {
+                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        items(shoppingListViewModel.shoppingLists) { shoppingList ->
+                            ShoppingListItem(
+                                shoppingList = shoppingList,
+                                onEdit = {
+                                    selectedShoppingList = shoppingList
+                                    showDialog = true
+                                },
+                                onDelete = {
+                                    shoppingListViewModel.removeShoppingList(shoppingList)
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
-    }
+    )
 
+    // Dialog for adding a new shopping list
+    if (showAddListDialog) {
+        AddShoppingListDialog(
+            onDismiss = { showAddListDialog = false },
+            onSave = { newName ->
+                shoppingListViewModel.addShoppingList(newName, emptyList()) // Empty list for new shopping list
+                showAddListDialog = false
+            }
+        )
+    }
     // Dialog for editing shopping list
     if (showDialog && selectedShoppingList != null) {
         EditShoppingListDialog(
@@ -79,6 +118,63 @@ fun ShoppingListScreen(
         )
     }
 }
+
+
+// Dialog for adding a new shopping list
+@Composable
+fun AddShoppingListDialog(
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit
+) {
+    var listName by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .heightIn(min = 200.dp), // Adjust dialog height
+            shape = MaterialTheme.shapes.medium,
+            color = Color.White
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Add New Shopping List",
+                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50)),
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
+
+                OutlinedTextField(
+                    value = listName,
+                    onValueChange = { listName = it },
+                    label = { Text("List Name") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                )
+
+                Button(
+                    onClick = {
+                        if (listName.isNotBlank()) {
+                            onSave(listName)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Save")
+                }
+
+                TextButton(onClick = onDismiss) {
+                    Text("Cancel")
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun EditShoppingListDialog(

@@ -66,27 +66,7 @@ fun LoginScreen(navController: NavHostController) {
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-// Email TextField
-//        OutlinedTextField(
-//            value = email,
-//            onValueChange = { email = it },
-//            placeholder = { Text("Enter email", color = Color.White) },
-//            singleLine = true,
-//            modifier = Modifier
-//                .fillMaxWidth(0.9f)
-//                .padding(vertical = 8.dp),
-//            colors = TextFieldDefaults.colors(
-//                focusedContainerColor = Color(0xFF66BB6A),
-//                unfocusedContainerColor = Color(0xFF66BB6A),
-//                focusedTextColor = Color.White,
-//                unfocusedTextColor = Color.White,
-//                focusedIndicatorColor = Color.Transparent,
-//                unfocusedIndicatorColor = Color.Transparent,
-//                focusedLabelColor = Color.White,
-//                unfocusedLabelColor = Color.White
-//            ),
-//            shape = RoundedCornerShape(30.dp)
-//        )
+
 
         EmailTextField(
             value = email,
@@ -104,46 +84,6 @@ fun LoginScreen(navController: NavHostController) {
             isError = false,
             errorText = ""
         )
-
-//        OutlinedTextField(
-//            value = password,
-//            onValueChange = { password = it },
-//            placeholder = { Text("Enter password", color = Color.White) },
-//            singleLine = true,
-//            modifier = Modifier
-//                .fillMaxWidth(0.9f)
-//                .padding(vertical = 8.dp),
-//            colors = TextFieldDefaults.colors(
-//                focusedContainerColor = Color(0xFF66BB6A),
-//                unfocusedContainerColor = Color(0xFF66BB6A),
-//                focusedTextColor = Color.White,
-//                unfocusedTextColor = Color.White,
-//                focusedIndicatorColor = Color.Transparent,
-//                unfocusedIndicatorColor = Color.Transparent,
-//                focusedLabelColor = Color.White,
-//                unfocusedLabelColor = Color.White
-//            ),
-//            shape = RoundedCornerShape(30.dp)
-//        )
-        // Login Button
-//        Button(
-//            onClick = {
-//                val users = loadUsers(context)
-//                val user = users.find { it.email == email && it.password == password }
-//                if (user != null) {
-//                    navController.navigate("opening")
-//                } else {
-//                    Toast.makeText(context, "Invalid email or password", Toast.LENGTH_SHORT).show()
-//                }
-//            },
-//            modifier = Modifier
-//                .fillMaxWidth(0.9f)
-//                .padding(vertical = 8.dp),
-//            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-//            shape = RoundedCornerShape(30.dp)
-//        ) {
-//            Text(text = "Login", color = Color.White, fontWeight = FontWeight.Bold)
-//        }
 
 
 
@@ -176,7 +116,7 @@ fun LoginScreen(navController: NavHostController) {
         FullWidthButton(
             label = "Create Account",
             onClick = {
-                navController.navigate("register")
+                navController.navigate("signup")
             },
             color = greenDarker,
             modifier = Modifier
