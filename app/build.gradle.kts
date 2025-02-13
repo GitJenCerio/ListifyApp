@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
+    id("kotlin-kapt")
 }
 
 android {
@@ -44,19 +45,19 @@ android {
         kotlinCompilerExtensionVersion = "1.5.2"
     }
 }
-
 dependencies {
-    // Core AndroidX and Compose dependencies
+    // Core AndroidX dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
 
-    // Compose BOM for consistent versions
-    implementation(platform(libs.androidx.compose.bom))
+    // Jetpack Compose dependencies
+    implementation(platform(libs.androidx.compose.bom)) // Ensures consistent Compose versions
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
@@ -67,15 +68,29 @@ dependencies {
     // Appcompat
     implementation(libs.androidx.appcompat)
 
-    // Gson (for JSON parsing, if needed)
-    implementation(libs.gson)
-    implementation(libs.engage.core)
-    implementation(libs.androidx.tools.core)
-    implementation(platform(libs.firebase.bom))
+    // Room Database
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler) // Use kapt for annotation processing
+
+    // Firebase & Google Play Services
+    implementation(platform(libs.firebase.bom)) // Keeps Firebase dependencies in sync
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.play.services.auth) // Google Sign-In SDK
 
+    // JSON Parsing
+    implementation(libs.gson)
+
+    // Additional dependencies
+    implementation(libs.engage.core)
+    implementation(libs.androidx.tools.core)
+    implementation(libs.androidx.runtime) // Ensure Compose runtime is up to date
+
+    // Debugging and tooling
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 
     // Testing dependencies
     testImplementation(libs.junit)
@@ -84,20 +99,6 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
-    implementation (libs.androidx.material.icons.extended)
-
-
-
-
-    // Debugging and tooling
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-    implementation (libs.play.services.auth) // Google Sign-In SDK
-    implementation (libs.firebase.auth)  // Firebase Authentication
-    implementation (libs.androidx.activity.ktx.v131)
-    implementation ("androidx.compose.runtime:runtime:1.7.7")  // Make sure Compose runtime is up to date
-
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-compiler:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
+    // Annotation processing
+    implementation(libs.annotations) // Ensure the latest version is used
 }
