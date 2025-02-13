@@ -1,28 +1,39 @@
 package com.jencerio.listifyapp
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.jencerio.listifyapp.viewmodel.BudgetViewModel
+import com.jencerio.listifyapp.factory.BudgetViewModelFactory
+import com.jencerio.listifyapp.model.BudgetCategory
+import com.jencerio.listifyapp.repository.BudgetRepository
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import com.jencerio.listifyapp.database.BudgetDatabase
 import com.jencerio.listifyapp.ui.theme.GreenAccent
-import com.jencerio.listifyapp.ui.theme.GreenSecondary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BudgetTrackingScreen(navController: NavHostController) {
-    var budgetItems by remember { mutableStateOf(listOf<BudgetCategory>()) }
+    val context = LocalContext.current
+    val budgetDao = BudgetDatabase.getDatabase(context).budgetDao()
+    val repository = BudgetRepository(budgetDao)
+    val viewModel: BudgetViewModel = viewModel(factory = BudgetViewModelFactory(repository))
+
+    val budgetItems by viewModel.budgetItems.collectAsState()
+
     var isDialogOpen by remember { mutableStateOf(false) }
     var categoryName by remember { mutableStateOf("") }
     var categoryAmount by remember { mutableStateOf("") }
@@ -36,13 +47,12 @@ fun BudgetTrackingScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Budget Tracking", color = Color.White, fontWeight = FontWeight.Bold) },
+                title = { Text("Budget Tracking") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(GreenSecondary),
+                }
             )
         },
         floatingActionButton = {
@@ -71,7 +81,7 @@ fun BudgetTrackingScreen(navController: NavHostController) {
                                 isDialogOpen = true
                             },
                             onDelete = {
-                                budgetItems = budgetItems - it
+                                viewModel.deleteBudgetItem(it)
                             }
                         )
                     }
@@ -87,11 +97,9 @@ fun BudgetTrackingScreen(navController: NavHostController) {
                 val newAmount = categoryAmount.toDoubleOrNull() ?: 0.0
                 if (categoryName.isNotBlank() && newAmount > 0) {
                     if (editingItem != null) {
-                        budgetItems = budgetItems.map {
-                            if (it == editingItem) it.copy(category = categoryName, amount = newAmount, isIncome = isIncome) else it
-                        }
+                        viewModel.updateBudgetItem(editingItem!!.copy(category = categoryName, amount = newAmount, isIncome = isIncome))
                     } else {
-                        budgetItems = budgetItems + BudgetCategory(categoryName, newAmount, isIncome)
+                        viewModel.addBudgetItem(BudgetCategory(category = categoryName, amount = newAmount, isIncome = isIncome))
                     }
                     isDialogOpen = false
                 }
@@ -103,26 +111,41 @@ fun BudgetTrackingScreen(navController: NavHostController) {
     }
 }
 
+
+
+@Composable
+fun SummaryCard(totalIncome: Double, totalExpense: Double, balance: Double) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = GreenAccent)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Total Income: $totalIncome", fontWeight = FontWeight.Bold, color = Color.White)
+            Text("Total Expense: $totalExpense", fontWeight = FontWeight.Bold, color = Color.White)
+            Text("Balance: $balance", fontWeight = FontWeight.Bold, color = Color.White)
+        }
+    }
+}
+
 @Composable
 fun BudgetItemRow(budgetItem: BudgetCategory, onEdit: (BudgetCategory) -> Unit, onDelete: (BudgetCategory) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .background(Color(0xFFE4F8EC), shape = RoundedCornerShape(16.dp))
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(budgetItem.category, fontWeight = FontWeight.Bold)
-            Text("$${budgetItem.amount.formatAmount()}", fontWeight = FontWeight.Bold)
-        }
-        Row {
-            IconButton(onClick = { onEdit(budgetItem) }) {
-                Icon(Icons.Filled.Edit, contentDescription = "Edit")
+        Row(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            Column {
+                Text(budgetItem.category, fontWeight = FontWeight.Bold)
+                Text("${budgetItem.amount}", color = if (budgetItem.isIncome) Color.Green else Color.Red)
             }
-            IconButton(onClick = { onDelete(budgetItem) }) {
-                Icon(Icons.Filled.Delete, contentDescription = "Delete")
+            Row {
+                IconButton(onClick = { onEdit(budgetItem) }) {
+                    Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                }
+                IconButton(onClick = { onDelete(budgetItem) }) {
+                    Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                }
             }
         }
     }
@@ -133,66 +156,43 @@ fun BudgetItemDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     categoryName: String,
-    setCategoryName: (String) -> Unit,
+    onCategoryNameChange: (String) -> Unit,
     categoryAmount: String,
-    setCategoryAmount: (String) -> Unit,
+    onCategoryAmountChange: (String) -> Unit,
     isIncome: Boolean,
-    setIsIncome: (Boolean) -> Unit
+    onIsIncomeChange: (Boolean) -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (categoryName.isEmpty()) "Add Budget Item" else "Edit Budget Item") },
+        title = { Text("Budget Item") },
         text = {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column {
                 OutlinedTextField(
                     value = categoryName,
-                    onValueChange = setCategoryName,
-                    label = { Text("Category") },
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = onCategoryNameChange,
+                    label = { Text("Category Name") }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = categoryAmount,
-                    onValueChange = setCategoryAmount,
-                    label = { Text("Amount") },
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = onCategoryAmountChange,
+                    label = { Text("Amount") }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text("Income")
-                    Switch(
-                        checked = isIncome,
-                        onCheckedChange = setIsIncome
-                    )
+                    Switch(checked = isIncome, onCheckedChange = onIsIncomeChange)
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = onConfirm) { Text("Confirm") }
+            Button(onClick = onConfirm) {
+                Text("Save")
+            }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            Button(onClick = onDismiss) {
+                Text("Cancel")
+            }
         }
     )
 }
 
-@Composable
-fun SummaryCard(totalIncome: Double, totalExpense: Double, balance: Double) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        colors = CardDefaults.cardColors(containerColor = GreenAccent),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text("Income: $${totalIncome.formatAmount()}", fontWeight = FontWeight.Bold, color = Color.White)
-            Text("Expenses: $${totalExpense.formatAmount()}", fontWeight = FontWeight.Bold, color = Color.White)
-            Text("Balance: $${balance.formatAmount()}", fontWeight = FontWeight.Bold, color = Color.White)
-        }
-    }
-}
-
-data class BudgetCategory(val category: String, val amount: Double, val isIncome: Boolean)
-
-fun Double.formatAmount(): String = "%.2f".format(this)
