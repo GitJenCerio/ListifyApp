@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.libs
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -95,8 +97,7 @@ dependencies {
     implementation (libs.androidx.activity.ktx.v131)
     implementation ("androidx.compose.runtime:runtime:1.7.7")  // Make sure Compose runtime is up to date
 
-
-
-
-
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
 }
