@@ -1,5 +1,6 @@
 package com.jencerio.listifyapp
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -28,13 +30,33 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.jencerio.listifyapp.database.AppDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun DashboardScreen(navController: NavHostController, shoppingListViewModel: ShoppingListViewModel) {
-    var isOffline by remember { mutableStateOf(false) }
+    // Fetch user data from Room database after successful login
+    val userDao = AppDatabase.getDatabase(LocalContext.current).userDao()
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
 
-    Scaffold(
-    ) { paddingValues ->
+    val email = FirebaseAuth.getInstance().currentUser?.email ?: ""
+
+    // Fetch user data from Room database
+    LaunchedEffect(email) {
+        val user = userDao.getUserByEmail(email)
+        if (user != null) {
+            firstName = user.firstName
+            lastName = user.lastName
+        }
+    }
+
+    val isOffline by remember { mutableStateOf(false) }
+
+    Scaffold { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -66,7 +88,8 @@ fun DashboardScreen(navController: NavHostController, shoppingListViewModel: Sho
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                ProfileSection(navController, isOffline) { isOffline = it }
+                // Pass firstName and lastName to ProfileSection
+                ProfileSection(navController, firstName, lastName)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
@@ -105,6 +128,44 @@ fun DashboardScreen(navController: NavHostController, shoppingListViewModel: Sho
 }
 
 @Composable
+fun ProfileSection(navController: NavHostController, firstName: String, lastName: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFF4CAF50))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Profile Image and Greeting
+        Image(
+            painter = painterResource(id = R.drawable.ic_profile),
+            contentDescription = "Profile Picture",
+            modifier = Modifier.size(80.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Greeting with first and last name
+        Text(
+            text = "Hi $firstName $lastName!",
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            fontSize = 24.sp
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Set Shopping Reminders button
+        Button(
+            onClick = { navController.navigate("set_reminder") },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+        ) {
+            Text(text = "Set Shopping Reminders", color = Color(0xFF4CAF50))
+        }
+    }
+}
+
+
+@Composable
 fun BottomNavigationBar(navController: NavController) {
     BottomAppBar(
         modifier = Modifier.fillMaxWidth(),
@@ -134,83 +195,6 @@ fun BottomNavigationBar(navController: NavController) {
     }
 }
 
-
-
-@Composable
-fun ProfileSection(navController: NavHostController, isOffline: Boolean, onOfflineToggle: (Boolean) -> Unit) {
-    // Get the current user's UID
-    val userId = FirebaseAuth.getInstance().currentUser?.uid
-
-    // Firestore instance
-    val firestore = FirebaseFirestore.getInstance()
-
-    // State to hold the first name and last name
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(true) } // To show loading initially
-
-    // Fetch user data from Firestore
-    LaunchedEffect(userId) {
-        if (userId != null) {
-            firestore.collection("users")
-                .document(userId)
-                .get()
-                .addOnSuccessListener { documentSnapshot ->
-                    if (documentSnapshot.exists()) {
-                        // Get data from Firestore and update the state
-                        firstName = documentSnapshot.getString("firstName") ?: "First Name"
-                        lastName = documentSnapshot.getString("lastName") ?: "Last Name"
-                    }
-                    isLoading = false // Hide loading after fetching the data
-                }
-                .addOnFailureListener { exception ->
-                    Log.w("ProfileSection", "Error fetching user data", exception)
-                    isLoading = false // Hide loading in case of error
-                }
-        }
-    }
-
-    // If data is still loading, show a loading indicator
-    if (isLoading) {
-        CircularProgressIndicator(color = Color.White)
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFF4CAF50))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Profile Image and Greeting
-        Image(
-            painter = painterResource(id = R.drawable.ic_profile),
-            contentDescription = "Profile Picture",
-            modifier = Modifier.size(80.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Greeting with first and last name from Firestore
-        Text(
-            text = "Hi $firstName $lastName!",
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            fontSize = 24.sp
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Set Shopping Reminders button
-        Button(
-            onClick = { navController.navigate("set_reminder") },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-        ) {
-            Text(text = "Set Shopping Reminders", color = Color(0xFF4CAF50))
-        }
-    }
-}
 @Composable
 fun ActionButtons(navController: NavHostController) {
     Row(
@@ -312,6 +296,27 @@ fun ShoppingListItem(
             }
             TextButton(onClick = onDelete) {
                 Text(text = "Delete", color = Color.Red)
+            }
+        }
+    }
+}
+
+fun signOut(context: Context, navController: NavHostController) {
+    // Sign out from Firebase
+    FirebaseAuth.getInstance().signOut()
+
+    // Clear user data from Room database
+    CoroutineScope(Dispatchers.IO).launch {
+        val userDao = AppDatabase.getDatabase(context).userDao()
+        val email = FirebaseAuth.getInstance().currentUser?.email
+        if (email != null) {
+            userDao.deleteUserByEmail(email)  // Deleting the user data from Room
+        }
+
+        // Navigate to login screen after sign-out
+        withContext(Dispatchers.Main) {
+            navController.navigate("login") {
+                popUpTo("dashboard") { inclusive = true }  // Clear back stack to prevent back navigation
             }
         }
     }

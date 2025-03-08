@@ -19,10 +19,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.navigation.NavHostController
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.jencerio.listifyapp.database.AppDatabase
+import com.jencerio.listifyapp.model.Users
 import com.jencerio.listifyapp.ui.theme.greenDark
 import com.jencerio.listifyapp.ui.theme.greenDarker
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
 @Composable
@@ -32,9 +34,14 @@ fun SignupScreen(navController: NavHostController) {
     var lastName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+
     val context = LocalContext.current
+
+    // Room Database and DAO
+    val userDao = AppDatabase.getDatabase(context).userDao()
+
+    // Firebase Authentication instance
     val auth = FirebaseAuth.getInstance()
-    val firestore = FirebaseFirestore.getInstance()
 
     // Helper for error states
     var emailError by remember { mutableStateOf(false) }
@@ -60,6 +67,9 @@ fun SignupScreen(navController: NavHostController) {
     // FocusRequester and KeyboardController
     val emailFocusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    // Coroutine scope to launch tasks asynchronously
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -161,27 +171,30 @@ fun SignupScreen(navController: NavHostController) {
                 validateFields()  // Check validation before submitting
                 if (!emailError && !firstNameError && !lastNameError && !passwordError && !confirmPasswordError) {
                     if (password == confirmPassword) {
+                        // Create a new User instance
+                        val newUser = Users(
+                            firstName = firstName,
+                            lastName = lastName,
+                            email = email,
+                            password = password
+                        )
+
+                        // Launch coroutine to insert data into Room database
+                        coroutineScope.launch {
+                            userDao.insert(newUser)  // Save user to the Room database
+                        }
+
+                        // Create user in Firebase Authentication
                         auth.createUserWithEmailAndPassword(email, password)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    // Save additional user info to Firestore
-                                    val user = auth.currentUser
-                                    val userData = hashMapOf(
-                                        "firstName" to firstName,
-                                        "lastName" to lastName,
-                                        "email" to email
-                                    )
-                                    firestore.collection("users")
-                                        .document(user?.uid ?: "")
-                                        .set(userData)
-                                        .addOnSuccessListener {
-                                            Toast.makeText(context, "User created successfully", Toast.LENGTH_SHORT).show()
-                                            navController.navigate("login")
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Toast.makeText(context, "Error saving user data", Toast.LENGTH_SHORT).show()
-                                        }
+                                    // Show Toast message for successful signup
+                                    Toast.makeText(context, "User created successfully", Toast.LENGTH_SHORT).show()
+
+                                    // Navigate to the login screen after a successful signup
+                                    navController.navigate("login")
                                 } else {
+                                    // Show error message if signup fails
                                     Toast.makeText(context, "Signup failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                                 }
                             }
