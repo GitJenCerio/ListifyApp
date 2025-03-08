@@ -6,10 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.jencerio.listifyapp.dao.BudgetDao
 import com.jencerio.listifyapp.dao.UserDao
-import com.jencerio.listifyapp.model.BudgetCategory
+import com.jencerio.listifyapp.model.Budget
 import com.jencerio.listifyapp.model.Users
 
-@Database(entities = [Users::class, BudgetCategory::class], version = 1, exportSchema = false)
+@Database(entities = [Users::class, Budget::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun budgetDao(): BudgetDao
     abstract fun userDao(): UserDao
@@ -24,7 +24,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

@@ -1,22 +1,22 @@
 package com.jencerio.listifyapp.repository
 
 import com.jencerio.listifyapp.dao.BudgetDao
-import com.jencerio.listifyapp.model.BudgetCategory
+import com.jencerio.listifyapp.model.Budget
 import kotlinx.coroutines.flow.Flow
 
-class BudgetRepository(private val budgetCategoryDao: BudgetDao) {
+class BudgetRepository(private val budgetDao: BudgetDao) {
 
-    val budgetItems: Flow<List<BudgetCategory>> = budgetCategoryDao.getAll()
+    val budgetItems: Flow<List<Budget>> = budgetDao.getAll()
 
-    suspend fun addBudgetItem(budgetCategory: BudgetCategory) {
-        budgetCategoryDao.insert(budgetCategory)
+    suspend fun addBudgetItem(budget: Budget) {
+        budgetDao.insert(budget)
     }
 
-    suspend fun updateBudgetItem(budgetCategory: BudgetCategory) {
-        budgetCategoryDao.update(budgetCategory)
+    suspend fun updateBudgetItem(budget: Budget) {
+        budgetDao.update(budget)
     }
 
-    suspend fun deleteBudgetItem(budgetCategory: BudgetCategory) {
-        budgetCategoryDao.delete(budgetCategory)
+    suspend fun deleteBudgetItem(budget: Budget) {
+        budgetDao.delete(budget)
     }
 }
