@@ -9,7 +9,7 @@ import com.jencerio.listifyapp.dao.UserDao
 import com.jencerio.listifyapp.model.Budget
 import com.jencerio.listifyapp.model.Users
 
-@Database(entities = [Users::class, Budget::class], version = 2, exportSchema = false)
+@Database(entities = [Users::class, Budget::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun budgetDao(): BudgetDao
     abstract fun userDao(): UserDao
@@ -24,9 +24,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
-                )
-                    .fallbackToDestructiveMigration()
-                    .build()
+                ).build()
                 INSTANCE = instance
                 instance
             }

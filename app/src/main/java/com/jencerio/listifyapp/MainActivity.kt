@@ -50,7 +50,11 @@ fun ListifyApp() {
                 composable("signup") { SignupScreen(navController) }
                 composable("forgot_password") { ForgotPasswordScreen(navController) }
                 composable("opening") { OpeningScreen(navController) }
-                composable("dashboard") { DashboardScreen(navController, shoppingListViewModel) }
+                composable("dashboard/{displayName}") { backStackEntry ->
+                    val displayName = backStackEntry.arguments?.getString("displayName") ?: "User"
+                    DashboardScreen(navController, shoppingListViewModel, displayName)
+                }
+
                 composable("new_list") { AddNewListScreen(navController, shoppingListViewModel) }
                 composable("shopping_list") { ShoppingListScreen(navController, shoppingListViewModel)
                 }

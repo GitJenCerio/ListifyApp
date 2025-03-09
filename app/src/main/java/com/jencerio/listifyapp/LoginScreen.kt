@@ -2,14 +2,32 @@ package com.jencerio.listifyapp
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,16 +46,10 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.jencerio.listifyapp.common.composable.EmailTextField
-import com.jencerio.listifyapp.common.composable.ForgotPasswordText
 import com.jencerio.listifyapp.common.composable.FullWidthButton
 import com.jencerio.listifyapp.common.composable.PasswordTextField
-import com.jencerio.listifyapp.database.AppDatabase
 import com.jencerio.listifyapp.ui.theme.greenDark
 import com.jencerio.listifyapp.ui.theme.greenDarker
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
@@ -49,8 +61,6 @@ fun LoginScreen(navController: NavHostController) {
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
 
-    // Room Database and DAO
-    val userDao = AppDatabase.getDatabase(context).userDao()
 
     // Set up Google Sign-In
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -93,6 +103,7 @@ fun LoginScreen(navController: NavHostController) {
     }
 
     // Function to handle Email/Password sign-in
+    @RequiresApi(Build.VERSION_CODES.O)
     fun handleEmailPasswordSignIn(
         email: String,
         password: String,
@@ -108,32 +119,21 @@ fun LoginScreen(navController: NavHostController) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Launch coroutine to fetch user data from Room
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val user = userDao.getUserByEmail(email) // Fetch user based on email
-                        if (user != null) {
-                            val firstName = user.firstName
-                            val lastName = user.lastName
+                    val firebaseUser = auth.currentUser
+                    firebaseUser?.let { user ->
+                        val username = extractUsernameFromEmail(user.email ?: "User") // Extract username
+                        Toast.makeText(context, "Welcome back, $username!", Toast.LENGTH_SHORT).show()
 
-                            // Store user info locally or update UI
-                            // Show success message and navigate
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(context, "Welcome back, $firstName $lastName!", Toast.LENGTH_SHORT).show()
-                                navController.navigate("dashboard")  // Navigating to dashboard screen after successful login
-                            }
-                        } else {
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(context, "User not found in local database", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+                        // Pass the username as an argument
+                        navController.navigate("dashboard/$username")
                     }
                 } else {
-                    // Handle failure
                     Log.w("Email Sign-In", "signInWithEmailAndPassword:failure", task.exception)
                     Toast.makeText(context, "Authentication Failed", Toast.LENGTH_SHORT).show()
                 }
             }
     }
+
 
     // Function to handle the forgot password logic
     fun handleForgotPassword(email: String, context: Context) {
@@ -282,4 +282,10 @@ fun LoginScreen(navController: NavHostController) {
 @Composable
 fun PreviewLoginScreen() {
     LoginScreen(navController = rememberNavController())
+}
+
+
+// Function to extract username (remove @domain)
+fun extractUsernameFromEmail(email: String): String {
+    return email.substringBefore("@") // Get everything before '@'
 }
