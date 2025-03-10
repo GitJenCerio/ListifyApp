@@ -153,8 +153,8 @@ fun BottomNavigationBar(navController: NavController) {
         val navItems = listOf(
             Pair(R.drawable.baseline_home_24, "dashboard/$displayName"),
             Pair(R.drawable.baseline_edit_document_24, "shopping_list"),
-            Pair(R.drawable.baseline_favorite_24, "favorites"),
-            Pair(R.drawable.baseline_inventory_24, "pantry_inventory_management"),
+//            Pair(R.drawable.baseline_favorite_24, "favorites"),
+//            Pair(R.drawable.baseline_inventory_24, "pantry_inventory_management"),
             Pair(R.drawable.baseline_attach_money_24, "budget_tracking")
         )
 

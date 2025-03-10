@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.jencerio.listifyapp.database.FirestoreHelper
 import com.jencerio.listifyapp.ui.theme.ListifyAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,6 +23,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             ListifyApp()
         }
+
+        FirestoreHelper.testFirestoreConnection();
     }
 }
 
