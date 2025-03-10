@@ -8,15 +8,15 @@ class ShoppingItemRepository(private val shoppingItemDao: ShoppingItemDao) {
 
     val shoppingItems: Flow<List<ShoppingItem>> = shoppingItemDao.getAll()
 
-    suspend fun addPantryItem(shoppingItem: ShoppingItem) {
+    suspend fun addShoppingItem(shoppingItem: ShoppingItem) {
         shoppingItemDao.insert(shoppingItem)
     }
 
-    suspend fun updatePantryItem(shoppingItem: ShoppingItem) {
+    suspend fun updateShoppingItem(shoppingItem: ShoppingItem) {
         shoppingItemDao.update(shoppingItem)
     }
 
-    suspend fun deletePantryItem(shoppingItem: ShoppingItem) {
+    suspend fun deleteShoppingItem(shoppingItem: ShoppingItem) {
         shoppingItemDao.delete(shoppingItem)
     }
 }

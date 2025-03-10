@@ -101,4 +101,22 @@ dependencies {
 
     // Annotation processing
     implementation(libs.annotations) // Ensure the latest version is used
+
+    // JUnit 5 (Jupiter API)
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+
+    // MockK for mocking dependencies
+    //noinspection UseTomlInstead
+    testImplementation("io.mockk:mockk:1.13.5")
+
+    // Kotlin coroutine testing
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    // AndroidX Room Testing
+    androidTestImplementation(libs.androidx.room.testing)
+
+    // JUnit 5 for Android Instrumented Tests
+    androidTestImplementation(libs.androidx.junit.v115)
+    androidTestImplementation(libs.androidx.espresso.core.v351)
 }

@@ -2,37 +2,39 @@ package com.jencerio.listifyapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jencerio.listifyapp.model.ShoppingItem
+import com.jencerio.listifyapp.repository.ShoppingItemRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ShoppingItemViewModel(private val repository: ShoppingItem) : ViewModel() {
-    private val _pantryItems = MutableStateFlow<List<PantryItem>>(emptyList())
-    val pantryItems: StateFlow<List<PantryItem>> get() = _pantryItems
+class ShoppingItemViewModel(private val repository: ShoppingItemRepository) : ViewModel() {
+    private val _shoppingItems = MutableStateFlow<List<ShoppingItem>>(emptyList())
+    val pantryItems: StateFlow<List<ShoppingItem>> get() = pantryItems
 
     init {
         viewModelScope.launch {
-            repository.pantryItems.collect { items ->
-                _pantryItems.value = items
+            repository.shoppingItems.collect { items ->
+                _shoppingItems.value = items
             }
         }
     }
 
-    fun addPantryItem(pantryItem: PantryItem) {
+    fun addShoppingItem(shoppingItem: ShoppingItem) {
         viewModelScope.launch {
-            repository.addPantryItem(pantryItem)
+            repository.addShoppingItem(shoppingItem)
         }
     }
 
-    fun updatePantryItem(pantryItem: PantryItem) {
+    fun updateShoppingItem(shoppingItem: ShoppingItem) {
         viewModelScope.launch {
-            repository.updatePantryItem(pantryItem)
+            repository.updateShoppingItem(shoppingItem)
         }
     }
 
-    fun deletePantryItem(pantryItem: PantryItem) {
+    fun deleteShoppingItem(shoppingItem: ShoppingItem) {
         viewModelScope.launch {
-            repository.deletePantryItem(pantryItem)
+            repository.deleteShoppingItem(shoppingItem)
         }
     }
 }
