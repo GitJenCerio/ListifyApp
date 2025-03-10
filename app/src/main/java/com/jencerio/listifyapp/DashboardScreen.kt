@@ -27,6 +27,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jencerio.listifyapp.database.AppDatabase
+import com.jencerio.listifyapp.model.ShoppingItem
+import com.jencerio.listifyapp.model.ShoppingList
+import com.jencerio.listifyapp.viewmodel.ShoppingListViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -253,18 +256,19 @@ fun ShoppingListItem(
             .padding(16.dp)
     ) {
         Text(
-            text = shoppingList.name,
+            text = shoppingList.title,
             style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black),
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        shoppingList.items.forEach { item ->
-            Text(
-                text = "- ${item.name} (x${item.quantity})",
-                style = TextStyle(fontSize = 14.sp, color = Color.Gray),
-                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
-            )
-        }
+        // Comment muna kasi may error
+//        shoppingList.items.forEach { item ->
+//            Text(
+//                text = "- ${item.name} (x${item.quantity})",
+//                style = TextStyle(fontSize = 14.sp, color = Color.Gray),
+//                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+//            )
+//        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
