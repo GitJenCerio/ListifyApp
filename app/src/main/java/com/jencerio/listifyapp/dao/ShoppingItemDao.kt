@@ -17,4 +17,7 @@ interface ShoppingItemDao {
 
     @Delete
     suspend fun delete(shoppingItem: ShoppingItem)
+
+    @Query("SELECT * FROM shopping_items WHERE shoppingListId = :shoppingListId")
+    fun getItemsByShoppingList(shoppingListId: String): Flow<List<ShoppingItem>>
 }
