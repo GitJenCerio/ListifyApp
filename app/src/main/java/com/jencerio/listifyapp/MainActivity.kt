@@ -1,6 +1,7 @@
 package com.jencerio.listifyapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +24,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ListifyApp()
         }
-
+        Log.d("MainActivity", "Checking if firestore helper is running...")
         FirestoreHelper.testFirestoreConnection();
     }
 }

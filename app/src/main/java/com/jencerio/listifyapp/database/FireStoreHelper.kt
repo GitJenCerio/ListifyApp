@@ -17,14 +17,17 @@ object FirestoreHelper {
         return db
     }
 
-    // Test Firestore connection by adding dummy data
+    fun useEmulatorForTesting() {
+        db.useEmulator("10.0.2.2", 8080)  // Emulator host and port for Firestore
+    }
+
     fun testFirestoreConnection() {
         val testDoc = hashMapOf("message" to "Firestore connected successfully!")
 
-        db.collection("test_collection").document("test_document")
+        db.collection("users").document("test_document")
             .set(testDoc)
             .addOnSuccessListener {
-                Log.d("Firestore", "Connection successful! Data written.")
+                Log.d("Firestore", "Connection successful! Data written to users collection.")
             }
             .addOnFailureListener { e ->
                 Log.e("Firestore", "Connection failed: ${e.message}")
