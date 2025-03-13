@@ -10,11 +10,12 @@ import java.util.Date
 @Entity(tableName = "shopping_lists")
 @TypeConverters(Converters::class)
 data class ShoppingList(
-    @PrimaryKey val id: String,
-    val userId: String,
-    val title: String,
-    val createdAt: Date,
-    val updatedAt: Date,
-    val isFavorite: Boolean
-)
-
+    @PrimaryKey val id: String = "",
+    val userId: String = "",
+    val title: String = "",
+    val createdAt: Date = Date(),
+    val updatedAt: Date = Date(),
+    val isFavorite: Boolean = false
+) {
+    constructor() : this("", "", "", Date(), Date(), false)
+}

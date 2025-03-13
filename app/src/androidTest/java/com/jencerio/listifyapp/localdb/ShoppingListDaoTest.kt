@@ -1,4 +1,4 @@
-package com.jencerio.listifyapp
+package com.jencerio.listifyapp.localdb
 
 
 import android.content.Context

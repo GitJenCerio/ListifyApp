@@ -1,4 +1,4 @@
-package com.jencerio.listifyapp.remote
+package com.jencerio.listifyapp.remotedb
 
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4

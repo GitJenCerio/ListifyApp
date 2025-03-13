@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class ShoppingItemViewModel(private val repository: ShoppingItemRepository) : ViewModel() {
     private val _shoppingItems = MutableStateFlow<List<ShoppingItem>>(emptyList())
-    val pantryItems: StateFlow<List<ShoppingItem>> get() = pantryItems
+    val shoppingItems: StateFlow<List<ShoppingItem>> get() = _shoppingItems
 
     init {
         viewModelScope.launch {
