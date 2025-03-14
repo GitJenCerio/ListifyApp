@@ -88,7 +88,11 @@ fun BudgetTrackingScreen(navController: NavHostController) {
                             isIncome = it.isIncome
                             isDialogOpen = true
                         },
-                        onDelete = { viewModel.deleteBudgetItem(it) }
+                        onDelete = {
+                            viewModel.markItemForDeletion(it)
+                            viewModel.syncPendingItems()
+                            viewModel.deleteBudgetItem(it)
+                        }
                     )
                 }
             }
@@ -107,7 +111,8 @@ fun BudgetTrackingScreen(navController: NavHostController) {
                                 category = categoryName,
                                 amount = newAmount,
                                 description = categoryDescription,
-                                isIncome = isIncome
+                                isIncome = isIncome,
+                                isSynced = false
                             )
                         )
                     } else {
@@ -118,10 +123,12 @@ fun BudgetTrackingScreen(navController: NavHostController) {
                                 category = categoryName,
                                 description = categoryDescription,
                                 amount = newAmount,
-                                isIncome = isIncome
+                                isIncome = isIncome,
+                                isSynced = false
                             )
                         )
                     }
+                    viewModel.syncPendingItems()
                     isDialogOpen = false
                 }
             },
@@ -136,6 +143,7 @@ fun BudgetTrackingScreen(navController: NavHostController) {
         )
     }
 }
+
 
 @Composable
 fun SummaryCard(totalIncome: Double, totalExpense: Double, balance: Double) {

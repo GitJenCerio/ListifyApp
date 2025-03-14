@@ -14,7 +14,8 @@ class BudgetTest {
             category = "Food",
             description = "Groceries",
             amount = 100.0,
-            isIncome = false
+            isIncome = false,
+            isSynced = false
         )
 
         assertEquals("123", budget.id)

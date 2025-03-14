@@ -7,7 +7,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ShoppingReminderDao {
     @Query("SELECT * FROM shopping_reminders")
-    fun getAll(): Flow<List<ShoppingReminder>> // Changed to Flow for real-time updates
+    fun getAll(): Flow<List<ShoppingReminder>> // For real-time updates
+
+    @Query("SELECT * FROM shopping_reminders")
+    suspend fun getAllAsList(): List<ShoppingReminder> // For sync operations
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(shoppingReminder: ShoppingReminder)
@@ -17,4 +20,10 @@ interface ShoppingReminderDao {
 
     @Delete
     suspend fun delete(shoppingReminder: ShoppingReminder)
+
+    @Query("SELECT * FROM shopping_reminders WHERE id = :id")
+    suspend fun getById(id: String): ShoppingReminder?
+
+    @Query("SELECT * FROM shopping_reminders WHERE userId = :userId")
+    fun getByUserId(userId: String): Flow<List<ShoppingReminder>>
 }

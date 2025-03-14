@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BudgetDao {
-    @Query("SELECT * FROM budget")
-    fun getAll(): Flow<List<Budget>> // Changed to Flow for real-time updates
+    @Query("SELECT * FROM budgets")
+    fun getAll(): Flow<List<Budget>>
 
-    @Query("SELECT * FROM budget WHERE id = :budgetId LIMIT 1")
-    suspend fun getBudgetById(budgetId: String): Budget? // Fetch budget by ID
+    @Query("SELECT * FROM budgets WHERE id = :budgetId LIMIT 1")
+    suspend fun getBudgetById(budgetId: String): Budget?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(budget: Budget)
@@ -20,4 +20,10 @@ interface BudgetDao {
 
     @Delete
     suspend fun delete(budget: Budget)
+
+    @Query("UPDATE budgets SET syncStatus = 'SYNCED' WHERE id = :id")
+    suspend fun markAsSynced(id: String)
+
+    @Query("SELECT * FROM budgets WHERE syncStatus = 'PENDING'")
+    suspend fun getPendingBudgetItems(): List<Budget>
 }

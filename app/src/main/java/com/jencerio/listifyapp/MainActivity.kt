@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -16,7 +17,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
-import com.jencerio.listifyapp.database.FirestoreHelper
 import com.jencerio.listifyapp.ui.theme.ListifyAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -79,9 +79,14 @@ fun ListifyApp() {
                 }
 
                 composable("new_list") { AddNewListScreen(navController, shoppingListViewModel) }
-                composable("shopping_list") { ShoppingListScreen(navController, shoppingListViewModel) }
+                composable("shopping_list") {
+                    ShoppingListScreen(
+                        navController,
+                        shoppingListViewModel
+                    )
+                }
                 composable("budget_tracking") { BudgetTrackingScreen(navController) }
-                // composable("set_reminder") { SetReminderScreen(navController) }
+//                composable("set_reminder") { SetReminderScreen(navController) }
             }
         }
     }

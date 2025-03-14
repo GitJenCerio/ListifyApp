@@ -46,7 +46,8 @@ class BudgetDaoTest {
             category = "Groceries",
             description = "Weekly shopping",
             amount = 50.0,
-            isIncome = false
+            isIncome = false,
+            isSynced = false
         )
 
         // Insert item
@@ -69,7 +70,8 @@ class BudgetDaoTest {
             category = "Groceries",
             description = "Weekly shopping",
             amount = 50.0,
-            isIncome = false
+            isIncome = false,
+            isSynced = false
         )
         budgetDao.insert(budgetItem)
 
@@ -97,7 +99,8 @@ class BudgetDaoTest {
             category = "Groceries",
             description = "Weekly shopping",
             amount = 50.0,
-            isIncome = false
+            isIncome = false,
+            isSynced = false
         )
         budgetDao.insert(budgetItem)
 
@@ -125,7 +128,8 @@ class BudgetDaoTest {
             category = "Groceries",
             description = "Weekly shopping",
             amount = 50.0,
-            isIncome = false
+            isIncome = false,
+            isSynced = false
         )
 
         val budgetItem2 = Budget(
@@ -134,7 +138,8 @@ class BudgetDaoTest {
             category = "Entertainment",
             description = "Movie night",
             amount = 30.0,
-            isIncome = false
+            isIncome = false,
+            isSynced = false
         )
 
         val budgetItem3 = Budget(
@@ -143,7 +148,8 @@ class BudgetDaoTest {
             category = "Salary",
             description = "Monthly income",
             amount = 2000.0,
-            isIncome = true
+            isIncome = true,
+            isSynced = false
         )
 
         // Insert items
