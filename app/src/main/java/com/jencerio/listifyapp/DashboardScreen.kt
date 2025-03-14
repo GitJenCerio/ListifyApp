@@ -131,7 +131,7 @@ fun ProfileSection(
         Spacer(modifier = Modifier.height(8.dp))
 
         Button(
-            onClick = { navController.navigate("set_reminder") },
+            onClick = { navController.navigate("set_reminder") }, // TODO: Navigate to set reminder screen
             colors = ButtonDefaults.buttonColors(containerColor = Color.White),
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {

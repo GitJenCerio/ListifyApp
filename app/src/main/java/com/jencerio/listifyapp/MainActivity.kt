@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.jencerio.listifyapp.database.FirestoreHelper
 import com.jencerio.listifyapp.ui.theme.ListifyAppTheme
 
@@ -24,8 +25,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             ListifyApp()
         }
-        Log.d("MainActivity", "Checking if firestore helper is running...")
-        FirestoreHelper.testFirestoreConnection();
+//        Log.d("MainActivity", "Checking if firestore helper is running...")
+//        FirestoreHelper.testFirestoreConnection();
     }
 }
 
@@ -34,6 +35,24 @@ class MainActivity : ComponentActivity() {
 fun ListifyApp() {
     val navController = rememberNavController()
     val shoppingListViewModel: ShoppingListViewModel = viewModel()
+
+    // Check if user is already logged in
+    val auth = FirebaseAuth.getInstance()
+    val startDestination = if (auth.currentUser != null) {
+        // User is already signed in, get username
+        val displayName = auth.currentUser?.displayName
+        val email = auth.currentUser?.email
+
+        val username = when {
+            !displayName.isNullOrEmpty() -> displayName
+            !email.isNullOrEmpty() -> email.substringBefore("@") // Extract username from email
+            else -> "User"
+        }
+
+        "dashboard/$username"  // Navigate directly to dashboard with username
+    } else {
+        "login"  // User is not signed in, show login screen
+    }
 
     ListifyAppTheme {
         val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -47,7 +66,7 @@ fun ListifyApp() {
         ) { innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = "login", // Start with login screen
+                startDestination = startDestination, // Now uses dynamic start destination
                 modifier = Modifier.padding(innerPadding),
             ) {
                 composable("login") { LoginScreen(navController) }
@@ -60,9 +79,9 @@ fun ListifyApp() {
                 }
 
                 composable("new_list") { AddNewListScreen(navController, shoppingListViewModel) }
-                composable("shopping_list") { ShoppingListScreen(navController, shoppingListViewModel)
-                }
+                composable("shopping_list") { ShoppingListScreen(navController, shoppingListViewModel) }
                 composable("budget_tracking") { BudgetTrackingScreen(navController) }
+                // composable("set_reminder") { SetReminderScreen(navController) }
             }
         }
     }
