@@ -1,5 +1,6 @@
 package com.jencerio.listifyapp.repository
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jencerio.listifyapp.dao.BudgetDao
 import com.jencerio.listifyapp.model.Budget
@@ -24,7 +25,12 @@ class BudgetRepository(private val budgetDao: BudgetDao) {
     }
 
     suspend fun deleteBudgetItem(budget: Budget) {
-        budgetDao.delete(budget)
+        Log.d("deleteBudgetItem", "I'm here : ${budget.toString()}")
+        if (budget.syncStatus == "TO_DELETE") {
+            budgetDao.delete(budget)
+        } else {
+            budgetDao.update(budget)
+        }
     }
 
 
@@ -63,5 +69,9 @@ class BudgetRepository(private val budgetDao: BudgetDao) {
                 e.printStackTrace() // Handle errors (e.g., log them)
             }
         }
+    }
+
+    suspend fun getBudgetById(id: String): Budget? {
+        return budgetDao.getBudgetById(id)
     }
 }

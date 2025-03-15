@@ -1,5 +1,6 @@
 package com.jencerio.listifyapp.dao
 
+import android.util.Log
 import androidx.room.*
 import com.jencerio.listifyapp.model.Budget
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +20,9 @@ interface BudgetDao {
     suspend fun update(budget: Budget)
 
     @Delete
-    suspend fun delete(budget: Budget)
+    suspend fun delete(budget: Budget) {
+        Log.d("BudgetDao", "Deleting budget from local DB: ${budget.id}")
+    }
 
     @Query("UPDATE budgets SET syncStatus = 'SYNCED' WHERE id = :id")
     suspend fun markAsSynced(id: String)

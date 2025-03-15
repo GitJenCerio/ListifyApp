@@ -1,7 +1,10 @@
 package com.jencerio.listifyapp
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,15 +12,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
+import com.jencerio.listifyapp.database.AppDatabase
+import com.jencerio.listifyapp.repository.BudgetRepository
 import com.jencerio.listifyapp.ui.theme.ListifyAppTheme
+import com.jencerio.listifyapp.viewmodel.BudgetViewModel
+import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,8 +38,25 @@ class MainActivity : ComponentActivity() {
         setContent {
             ListifyApp()
         }
+        scheduleSyncWorker(this)
 //        Log.d("MainActivity", "Checking if firestore helper is running...")
 //        FirestoreHelper.testFirestoreConnection();
+    }
+
+    @SuppressLint("ServiceCast")
+    private fun isInternetAvailable(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
+    private fun fetchBudgets() {
+        val budgetViewModel = BudgetViewModel(BudgetRepository(AppDatabase.getDatabase(this).budgetDao()))
+        lifecycleScope.launch {
+            budgetViewModel.syncBudgetPendingItems()
+        }
     }
 }
 
@@ -90,4 +120,21 @@ fun ListifyApp() {
             }
         }
     }
+}
+
+
+fun scheduleSyncWorker(context: Context) {
+    val constraints = Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED) // Only sync when internet is available
+        .build()
+
+    val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(15, TimeUnit.MINUTES)
+        .setConstraints(constraints)
+        .build()
+
+    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+        "SyncWorker",
+        ExistingPeriodicWorkPolicy.KEEP,
+        syncRequest
+    )
 }

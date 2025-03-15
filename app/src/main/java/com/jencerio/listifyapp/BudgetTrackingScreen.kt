@@ -1,5 +1,6 @@
 package com.jencerio.listifyapp
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,8 @@ import com.jencerio.listifyapp.factory.BudgetViewModelFactory
 import com.jencerio.listifyapp.model.Budget
 import com.jencerio.listifyapp.repository.BudgetRepository
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.ui.graphics.Color
@@ -46,13 +49,18 @@ fun BudgetTrackingScreen(navController: NavHostController) {
     val totalExpense = budgetItems.filter { !it.isIncome }.sumOf { it.amount }
     val balance = totalIncome - totalExpense
 
+    // Sync pending items on screen load
+    LaunchedEffect(Unit) {
+        viewModel.syncBudgetPendingItems() // Ensure UI gets updated from Firestore
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Budget Tracking") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -88,10 +96,9 @@ fun BudgetTrackingScreen(navController: NavHostController) {
                             isIncome = it.isIncome
                             isDialogOpen = true
                         },
-                        onDelete = {
-                            viewModel.markItemForDeletion(it)
-                            viewModel.syncPendingItems()
-                            viewModel.deleteBudgetItem(it)
+                        onDelete = { budgetItem ->
+                            Log.d("BudgetTrackingScreen", "Item to delete: $budgetItem")
+                            viewModel.deleteBudgetItem(budgetItem)
                         }
                     )
                 }
@@ -112,6 +119,7 @@ fun BudgetTrackingScreen(navController: NavHostController) {
                                 amount = newAmount,
                                 description = categoryDescription,
                                 isIncome = isIncome,
+                                syncStatus = "PENDING", // Ensure it syncs
                                 isSynced = false
                             )
                         )
@@ -124,11 +132,12 @@ fun BudgetTrackingScreen(navController: NavHostController) {
                                 description = categoryDescription,
                                 amount = newAmount,
                                 isIncome = isIncome,
+                                syncStatus = "PENDING", // Ensure new items sync
                                 isSynced = false
                             )
                         )
                     }
-                    viewModel.syncPendingItems()
+                    viewModel.syncBudgetPendingItems()
                     isDialogOpen = false
                 }
             },
@@ -143,7 +152,6 @@ fun BudgetTrackingScreen(navController: NavHostController) {
         )
     }
 }
-
 
 @Composable
 fun SummaryCard(totalIncome: Double, totalExpense: Double, balance: Double) {
@@ -161,7 +169,6 @@ fun SummaryCard(totalIncome: Double, totalExpense: Double, balance: Double) {
         }
     }
 }
-
 @Composable
 fun BudgetItemRow(budgetItem: Budget, onEdit: (Budget) -> Unit, onDelete: (Budget) -> Unit) {
     Card(
