@@ -153,4 +153,12 @@ class BudgetViewModel(private val repository: BudgetRepository) : ViewModel() {
             Log.d("BudgetViewModel", "Budget has been removed $budget")
         }
     }
+
+    fun softDeleteBudgetItem(budget: Budget) {
+        viewModelScope.launch {
+            val updatedBudget = budget.copy(isDeleted = true, syncStatus = "PENDING") // Mark for deletion and sync
+            repository.updateBudgetItem(updatedBudget)
+        }
+    }
+
 }

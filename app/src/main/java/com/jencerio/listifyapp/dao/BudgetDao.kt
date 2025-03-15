@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BudgetDao {
-    @Query("SELECT * FROM budgets")
+    @Query("SELECT * FROM budgets WHERE isDeleted = 0")
     fun getAll(): Flow<List<Budget>>
 
     @Query("SELECT * FROM budgets WHERE id = :budgetId LIMIT 1")
@@ -29,4 +29,12 @@ interface BudgetDao {
 
     @Query("SELECT * FROM budgets WHERE syncStatus = 'PENDING'")
     suspend fun getPendingBudgetItems(): List<Budget>
+
+    // Soft delete: instead of deleting, mark as deleted
+    @Query("UPDATE budgets SET isDeleted = 1 WHERE id = :id")
+    suspend fun softDelete(id: String)
+
+    // Retrieve all items marked for deletion (for syncing before hard delete)
+    @Query("SELECT * FROM budgets WHERE isDeleted = 1")
+    suspend fun getDeletedBudgets(): List<Budget>
 }

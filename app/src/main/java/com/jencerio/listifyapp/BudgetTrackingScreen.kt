@@ -97,8 +97,8 @@ fun BudgetTrackingScreen(navController: NavHostController) {
                             isDialogOpen = true
                         },
                         onDelete = { budgetItem ->
-                            Log.d("BudgetTrackingScreen", "Item to delete: $budgetItem")
-                            viewModel.deleteBudgetItem(budgetItem)
+                            Log.d("BudgetTrackingScreen", "Soft deleting item: ${budgetItem.id}")
+                            viewModel.softDeleteBudgetItem(budgetItem)
                         }
                     )
                 }

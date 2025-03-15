@@ -11,12 +11,12 @@ data class Budget(
     val category: String,
     val description: String,
     val amount: Double,
-    @PropertyName("income") // Map Firestore field "income" to "isIncome"
+    @PropertyName("income")
     val isIncome: Boolean,
-    val syncStatus: String = "PENDING", // NEW FIELD (PENDING / SYNCED or TO_DELETE)
-    @PropertyName("synced") // Map Firestore field "synced" to "isSynced"
-    val isSynced: Boolean
+    val syncStatus: String = "PENDING",
+    @PropertyName("synced")
+    val isSynced: Boolean,
+    val isDeleted: Boolean = false // NEW FIELD for soft deletion
 ) {
-    // Add a no-argument constructor for Firestore
-    constructor() : this("", "", "", "", 0.0, false, "PENDING", false)
+    constructor() : this("", "", "", "", 0.0, false, "PENDING", false, false)
 }
