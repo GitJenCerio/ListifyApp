@@ -45,4 +45,29 @@ class ShoppingListRepository(private val shoppingListDao: ShoppingListDao?) { //
         val documentSnapshot = collectionRef.document(id).get().await()
         return documentSnapshot.toObject(ShoppingList::class.java)
     }
+
+    suspend fun getPendingShoppingLists(): List<ShoppingList> {
+        return shoppingListDao?.getPendingShoppingLists() ?: throw IllegalStateException("Local DB not initialized")
+    }
+
+    suspend fun markAsSynced(shoppingList: ShoppingList) {
+        shoppingListDao?.markAsSynced(shoppingList.id)
+    }
+
+    suspend fun syncPendingShoppingLists() {
+        val pendingShoppingLists = getPendingShoppingLists()
+        for (shoppingList in pendingShoppingLists) {
+            try {
+                firestore.collection("shopping_lists").document(shoppingList.id).set(shoppingList)
+                    .await()
+                shoppingListDao?.markAsSynced(shoppingList.id) // Mark as synced after success
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    suspend fun getShoppingListById(id: String): ShoppingList? {
+        return shoppingListDao?.getShoppingListById(id)
+    }
 }

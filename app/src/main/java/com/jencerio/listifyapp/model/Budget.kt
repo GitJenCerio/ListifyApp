@@ -16,7 +16,7 @@ data class Budget(
     val syncStatus: String = "PENDING",
     @PropertyName("synced")
     val isSynced: Boolean,
-    val isDeleted: Boolean = false // NEW FIELD for soft deletion
+    val isDeleted: Boolean = false
 ) {
     constructor() : this("", "", "", "", 0.0, false, "PENDING", false, false)
 }

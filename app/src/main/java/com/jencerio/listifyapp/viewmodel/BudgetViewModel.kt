@@ -18,7 +18,7 @@ class BudgetViewModel(private val repository: BudgetRepository) : ViewModel() {
     private val _budgetItems = MutableStateFlow<List<Budget>>(emptyList())
     val budgetItems: StateFlow<List<Budget>> get() = _budgetItems
 
-    private val db = Firebase.firestore // Firestore instance
+    private val db = Firebase.firestore
 
     init {
         viewModelScope.launch {
