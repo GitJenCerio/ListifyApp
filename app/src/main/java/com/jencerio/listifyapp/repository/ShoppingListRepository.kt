@@ -1,30 +1,44 @@
 package com.jencerio.listifyapp.repository
 
+import android.util.Log
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.DocumentSnapshot
 import com.jencerio.listifyapp.dao.ShoppingListDao
+import com.jencerio.listifyapp.model.Budget
 import com.jencerio.listifyapp.model.ShoppingList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 
-class ShoppingListRepository(private val shoppingListDao: ShoppingListDao?) { // 🔹 Make it optional
+class ShoppingListRepository(private val shoppingListDao: ShoppingListDao?) {
+
     private val firestore = FirebaseFirestore.getInstance()
     private val collectionRef = firestore.collection("shopping_lists")
 
-    fun getShoppingLists(): Flow<List<ShoppingList>> {
-        return shoppingListDao?.getAll() ?: throw IllegalStateException("Local DB not initialized")
-    }
+
+    val shoppingList: Flow<List<ShoppingList>> = shoppingListDao?.getAll()!!
+
 
     suspend fun addShoppingList(shoppingList: ShoppingList) {
-        shoppingListDao?.insert(shoppingList) ?: throw IllegalStateException("Local DB not initialized")
+        shoppingListDao?.insert(shoppingList)
+            ?: throw IllegalStateException("Local DB not initialized")
     }
 
     suspend fun updateShoppingList(shoppingList: ShoppingList) {
-        shoppingListDao?.update(shoppingList) ?: throw IllegalStateException("Local DB not initialized")
+        shoppingListDao?.update(shoppingList)
+            ?: throw IllegalStateException("Local DB not initialized")
     }
 
     suspend fun deleteShoppingList(shoppingList: ShoppingList) {
-        shoppingListDao?.delete(shoppingList) ?: throw IllegalStateException("Local DB not initialized")
+        Log.d("deleteShoppingList", "I'm here : ${shoppingList.toString()}")
+
+        if (shoppingList.syncStatus == "TO_DELETE") {
+            shoppingListDao?.delete(shoppingList)
+        } else {
+            shoppingListDao?.update(shoppingList)
+        }
     }
 
     // 🔥 Firebase Firestore CRUD Methods 🔥
@@ -47,7 +61,8 @@ class ShoppingListRepository(private val shoppingListDao: ShoppingListDao?) { //
     }
 
     suspend fun getPendingShoppingLists(): List<ShoppingList> {
-        return shoppingListDao?.getPendingShoppingLists() ?: throw IllegalStateException("Local DB not initialized")
+        return shoppingListDao?.getPendingShoppingLists()
+            ?: throw IllegalStateException("Local DB not initialized")
     }
 
     suspend fun markAsSynced(shoppingList: ShoppingList) {
@@ -69,5 +84,40 @@ class ShoppingListRepository(private val shoppingListDao: ShoppingListDao?) { //
 
     suspend fun getShoppingListById(id: String): ShoppingList? {
         return shoppingListDao?.getShoppingListById(id)
+    }
+
+    // Get active lists from local DB
+    suspend fun getActiveShoppingLists(): List<ShoppingList> {
+        return shoppingListDao?.getActiveLists() ?: emptyList()
+    }
+
+    // Cleanup deleted items in local DB
+    suspend fun cleanupDeletedShoppingLists() {
+        shoppingListDao?.cleanupDeleted()
+    }
+
+    // Fetch from Firestore (including deleted items)
+    suspend fun getShoppingListsFromFirestore(userId: String): List<ShoppingList> {
+        return try {
+            firestore.collection("shoppingLists")
+                .whereEqualTo("userId", userId)
+                .get()
+                .await()
+                .toObjects(ShoppingList::class.java)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    // Upsert with proper Firestore mapping
+    suspend fun upsertShoppingList(list: ShoppingList) {
+        // Convert Firestore's 'deleted' to local 'isDeleted'
+        val localList = list.copy(isDeleted = list.isDeleted)
+        shoppingListDao?.upsertShoppingList(localList)
+    }
+
+    // Hard delete implementation
+    suspend fun hardDeleteShoppingList(list: ShoppingList) {
+        shoppingListDao?.hardDeleteShoppingList(list.id)
     }
 }

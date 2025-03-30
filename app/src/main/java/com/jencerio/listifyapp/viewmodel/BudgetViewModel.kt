@@ -160,5 +160,4 @@ class BudgetViewModel(private val repository: BudgetRepository) : ViewModel() {
             repository.updateBudgetItem(updatedBudget)
         }
     }
-
 }

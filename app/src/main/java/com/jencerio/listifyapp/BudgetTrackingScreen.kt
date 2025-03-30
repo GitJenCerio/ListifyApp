@@ -78,13 +78,17 @@ fun BudgetTrackingScreen(navController: NavHostController) {
             }
         }
     ) { innerPadding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)) {
-            SummaryCard(totalIncome, totalExpense, balance)
-            LazyColumn(modifier = Modifier
+        Column(
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)) {
+                .padding(innerPadding)
+        ) {
+            SummaryCard(totalIncome, totalExpense, balance)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
                 items(budgetItems.size) { index ->
                     BudgetItemRow(
                         budgetItem = budgetItems[index],
@@ -169,6 +173,7 @@ fun SummaryCard(totalIncome: Double, totalExpense: Double, balance: Double) {
         }
     }
 }
+
 @Composable
 fun BudgetItemRow(budgetItem: Budget, onEdit: (Budget) -> Unit, onDelete: (Budget) -> Unit) {
     Card(

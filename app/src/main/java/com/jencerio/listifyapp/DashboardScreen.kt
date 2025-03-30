@@ -35,7 +35,6 @@ import kotlinx.coroutines.withContext
 @Composable
 fun DashboardScreen(
     navController: NavHostController,
-    shoppingListViewModel: ShoppingListViewModel,
     displayName: String,
 ) {
     val userDao = AppDatabase.getDatabase(LocalContext.current).userDao()
@@ -218,67 +217,67 @@ fun ActionButtons(navController: NavHostController) {
 }
 
 
-@Composable
-fun ShoppingListSection(items: List<ShoppingItem>) {
-    Text(
-        text = "Items in List:",
-        style = TextStyle(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        ),
-        modifier = Modifier.padding(8.dp)
-    )
-    items.forEach { item ->
-        Text(
-            text = "- ${item.name} (x${item.quantity})",
-            style = TextStyle(fontSize = 14.sp, color = Color.Gray),
-            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
-        )
-    }
-}
+//@Composable
+//fun ShoppingListSection(items: List<ShoppingItem>) {
+//    Text(
+//        text = "Items in List:",
+//        style = TextStyle(
+//            fontSize = 16.sp,
+//            fontWeight = FontWeight.Bold,
+//            color = Color.Black
+//        ),
+//        modifier = Modifier.padding(8.dp)
+//    )
+//    items.forEach { item ->
+//        Text(
+//            text = "- ${item.name} (x${item.quantity})",
+//            style = TextStyle(fontSize = 14.sp, color = Color.Gray),
+//            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
+//        )
+//    }
+//}
+//
 
-
-@Composable
-fun ShoppingListItem(
-    shoppingList: ShoppingList,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(Color.White, shape = MaterialTheme.shapes.medium)
-            .padding(16.dp)
-    ) {
-        Text(
-            text = shoppingList.name,
-            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        shoppingList.items.forEach { item ->
-            Text(
-                text = "- ${item.name} (x${item.quantity})",
-                style = TextStyle(fontSize = 14.sp, color = Color.Gray),
-                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            TextButton(onClick = onEdit) {
-                Text(text = "Edit", color = Color(0xFF4CAF50))
-            }
-            TextButton(onClick = onDelete) {
-                Text(text = "Delete", color = Color.Red)
-            }
-        }
-    }
-}
+//@Composable
+//fun ShoppingListItem(
+//    shoppingList: ShoppingList,
+//    onEdit: () -> Unit,
+//    onDelete: () -> Unit
+//) {
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(8.dp)
+//            .background(Color.White, shape = MaterialTheme.shapes.medium)
+//            .padding(16.dp)
+//    ) {
+//        Text(
+//            text = shoppingList.name,
+//            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black),
+//            modifier = Modifier.padding(bottom = 8.dp)
+//        )
+//
+//        shoppingList.items.forEach { item ->
+//            Text(
+//                text = "- ${item.name} (x${item.quantity})",
+//                style = TextStyle(fontSize = 14.sp, color = Color.Gray),
+//                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+//            )
+//        }
+//
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.End
+//        ) {
+//            TextButton(onClick = onEdit) {
+//                Text(text = "Edit", color = Color(0xFF4CAF50))
+//            }
+//            TextButton(onClick = onDelete) {
+//                Text(text = "Delete", color = Color.Red)
+//            }
+//        }
+//    }
+//}
 
 fun signOut(context: Context, navController: NavHostController) {
     // Sign out from Firebase

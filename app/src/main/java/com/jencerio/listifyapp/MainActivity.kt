@@ -27,8 +27,10 @@ import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
 import com.jencerio.listifyapp.database.AppDatabase
 import com.jencerio.listifyapp.repository.BudgetRepository
+import com.jencerio.listifyapp.repository.ShoppingListRepository
 import com.jencerio.listifyapp.ui.theme.ListifyAppTheme
 import com.jencerio.listifyapp.viewmodel.BudgetViewModel
+import com.jencerio.listifyapp.viewmodel.ShoppingListViewModel
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -58,13 +60,19 @@ class MainActivity : ComponentActivity() {
             budgetViewModel.syncBudgetPendingItems()
         }
     }
+
+    private fun fetchShoppingLists() {
+        val shoppingListViewModel = ShoppingListViewModel(ShoppingListRepository(AppDatabase.getDatabase(this).shoppingListDao()))
+        lifecycleScope.launch {
+            shoppingListViewModel.syncShoppingListPendingItems()
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ListifyApp() {
     val navController = rememberNavController()
-    val shoppingListViewModel: ShoppingListViewModel = viewModel()
 
     // Check if user is already logged in
     val auth = FirebaseAuth.getInstance()
@@ -105,14 +113,12 @@ fun ListifyApp() {
                 composable("opening") { OpeningScreen(navController) }
                 composable("dashboard/{displayName}") { backStackEntry ->
                     val displayName = backStackEntry.arguments?.getString("displayName") ?: "User"
-                    DashboardScreen(navController, shoppingListViewModel, displayName)
+                    DashboardScreen(navController, displayName)
                 }
 
-                composable("new_list") { AddNewListScreen(navController, shoppingListViewModel) }
                 composable("shopping_list") {
                     ShoppingListScreen(
                         navController,
-                        shoppingListViewModel
                     )
                 }
                 composable("budget_tracking") { BudgetTrackingScreen(navController) }
