@@ -12,7 +12,20 @@
           "package_name": "com.jencerio.listifyapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "715719013362-ta3uhi1vbg6f02d36va3k0nidciceerd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jencerio.listifyapp",
+            "certificate_hash": "3953622a43c7707b035fee7c126d8dc27c146419"
+          }
+        },
+        {
+          "client_id": "715719013362-or3qte6vttfdkk5omfcgr50bjni6dq7j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDUjqU81sL9J8tzeCK3xdUh9rJyLsaQbuI"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "715719013362-or3qte6vttfdkk5omfcgr50bjni6dq7j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

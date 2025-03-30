@@ -1,12 +1,9 @@
 package com.jencerio.listifyapp
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,7 +26,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.jencerio.listifyapp.database.AppDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,15 +33,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun DashboardScreen(navController: NavHostController, shoppingListViewModel: ShoppingListViewModel) {
-    // Fetch user data from Room database after successful login
+fun DashboardScreen(
+    navController: NavHostController,
+    displayName: String,
+) {
     val userDao = AppDatabase.getDatabase(LocalContext.current).userDao()
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
 
     val email = FirebaseAuth.getInstance().currentUser?.email ?: ""
 
-    // Fetch user data from Room database
     LaunchedEffect(email) {
         val user = userDao.getUserByEmail(email)
         if (user != null) {
@@ -88,8 +85,8 @@ fun DashboardScreen(navController: NavHostController, shoppingListViewModel: Sho
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                // Pass firstName and lastName to ProfileSection
-                ProfileSection(navController, firstName, lastName)
+                // Pass firstName and lastName instead of displayName
+                ProfileSection(navController, displayName)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
@@ -99,36 +96,16 @@ fun DashboardScreen(navController: NavHostController, shoppingListViewModel: Sho
                     color = Color(0xFF4CAF50),
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-
-                LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                    if (shoppingListViewModel.shoppingLists.isEmpty()) {
-                        item {
-                            Text(
-                                text = "You have no shopping lists yet.",
-                                color = Color.Gray,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp)
-                            )
-                        }
-                    } else {
-                        items(shoppingListViewModel.shoppingLists) { shoppingList ->
-                            ShoppingListItem(
-                                shoppingList = shoppingList,
-                                onEdit = { /* Navigate to edit functionality */ },
-                                onDelete = { shoppingListViewModel.removeShoppingList(shoppingList) }
-                            )
-                        }
-                    }
-                }
             }
         }
     }
 }
 
 @Composable
-fun ProfileSection(navController: NavHostController, firstName: String, lastName: String) {
+fun ProfileSection(
+    navController: NavHostController,
+    displayName: String
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -136,7 +113,6 @@ fun ProfileSection(navController: NavHostController, firstName: String, lastName
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Profile Image and Greeting
         Image(
             painter = painterResource(id = R.drawable.ic_profile),
             contentDescription = "Profile Picture",
@@ -144,18 +120,17 @@ fun ProfileSection(navController: NavHostController, firstName: String, lastName
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Greeting with first and last name
+        // Use displayName instead of firstName & lastName
         Text(
-            text = "Hi $firstName $lastName!",
+            text = "Hi $displayName!",
             fontWeight = FontWeight.Bold,
             color = Color.White,
             fontSize = 24.sp
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Set Shopping Reminders button
         Button(
-            onClick = { navController.navigate("set_reminder") },
+            onClick = { navController.navigate("set_reminder") }, // TODO: Navigate to set reminder screen
             colors = ButtonDefaults.buttonColors(containerColor = Color.White),
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
@@ -167,15 +142,18 @@ fun ProfileSection(navController: NavHostController, firstName: String, lastName
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val displayName = extractUsernameFromEmail(currentUser?.email ?: "User") // Extract name from email
+
     BottomAppBar(
         modifier = Modifier.fillMaxWidth(),
         containerColor = Color(0xFF4CAF50) // Green color for the bottom bar
     ) {
         val navItems = listOf(
-            Pair(R.drawable.baseline_home_24, "dashboard"),
+            Pair(R.drawable.baseline_home_24, "dashboard/$displayName"),
             Pair(R.drawable.baseline_edit_document_24, "shopping_list"),
-            Pair(R.drawable.baseline_favorite_24, "favorites"),
-            Pair(R.drawable.baseline_inventory_24, "pantry_inventory_management"),
+//            Pair(R.drawable.baseline_favorite_24, "favorites"),
+//            Pair(R.drawable.baseline_inventory_24, "pantry_inventory_management"),
             Pair(R.drawable.baseline_attach_money_24, "budget_tracking")
         )
 
@@ -239,67 +217,67 @@ fun ActionButtons(navController: NavHostController) {
 }
 
 
-@Composable
-fun ShoppingListSection(items: List<ShoppingItem>) {
-    Text(
-        text = "Items in List:",
-        style = TextStyle(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        ),
-        modifier = Modifier.padding(8.dp)
-    )
-    items.forEach { item ->
-        Text(
-            text = "- ${item.name} (x${item.quantity})",
-            style = TextStyle(fontSize = 14.sp, color = Color.Gray),
-            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
-        )
-    }
-}
+//@Composable
+//fun ShoppingListSection(items: List<ShoppingItem>) {
+//    Text(
+//        text = "Items in List:",
+//        style = TextStyle(
+//            fontSize = 16.sp,
+//            fontWeight = FontWeight.Bold,
+//            color = Color.Black
+//        ),
+//        modifier = Modifier.padding(8.dp)
+//    )
+//    items.forEach { item ->
+//        Text(
+//            text = "- ${item.name} (x${item.quantity})",
+//            style = TextStyle(fontSize = 14.sp, color = Color.Gray),
+//            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
+//        )
+//    }
+//}
+//
 
-
-@Composable
-fun ShoppingListItem(
-    shoppingList: ShoppingList,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(Color.White, shape = MaterialTheme.shapes.medium)
-            .padding(16.dp)
-    ) {
-        Text(
-            text = shoppingList.name,
-            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        shoppingList.items.forEach { item ->
-            Text(
-                text = "- ${item.name} (x${item.quantity})",
-                style = TextStyle(fontSize = 14.sp, color = Color.Gray),
-                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            TextButton(onClick = onEdit) {
-                Text(text = "Edit", color = Color(0xFF4CAF50))
-            }
-            TextButton(onClick = onDelete) {
-                Text(text = "Delete", color = Color.Red)
-            }
-        }
-    }
-}
+//@Composable
+//fun ShoppingListItem(
+//    shoppingList: ShoppingList,
+//    onEdit: () -> Unit,
+//    onDelete: () -> Unit
+//) {
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(8.dp)
+//            .background(Color.White, shape = MaterialTheme.shapes.medium)
+//            .padding(16.dp)
+//    ) {
+//        Text(
+//            text = shoppingList.name,
+//            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black),
+//            modifier = Modifier.padding(bottom = 8.dp)
+//        )
+//
+//        shoppingList.items.forEach { item ->
+//            Text(
+//                text = "- ${item.name} (x${item.quantity})",
+//                style = TextStyle(fontSize = 14.sp, color = Color.Gray),
+//                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+//            )
+//        }
+//
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.End
+//        ) {
+//            TextButton(onClick = onEdit) {
+//                Text(text = "Edit", color = Color(0xFF4CAF50))
+//            }
+//            TextButton(onClick = onDelete) {
+//                Text(text = "Delete", color = Color.Red)
+//            }
+//        }
+//    }
+//}
 
 fun signOut(context: Context, navController: NavHostController) {
     // Sign out from Firebase

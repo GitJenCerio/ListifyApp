@@ -101,4 +101,35 @@ dependencies {
 
     // Annotation processing
     implementation(libs.annotations) // Ensure the latest version is used
+
+    // JUnit 5 (Jupiter API)
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+
+    // MockK for mocking dependencies
+    //noinspection UseTomlInstead
+    testImplementation("io.mockk:mockk:1.13.5")
+
+    // https://mvnrepository.com/artifact/org.mockito/mockito-core
+    testImplementation("org.mockito:mockito-core:5.16.0")
+    testImplementation("org.mockito:mockito-inline:4.11.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+    // Kotlin coroutine testing
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    // AndroidX Room Testing
+    androidTestImplementation(libs.androidx.room.testing)
+
+    // JUnit 5 for Android Instrumented Tests
+    androidTestImplementation(libs.androidx.junit.v115)
+    androidTestImplementation(libs.androidx.espresso.core.v351)
+
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-gson
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    runtimeOnly(libs.androidx.work.runtime.ktx)
 }

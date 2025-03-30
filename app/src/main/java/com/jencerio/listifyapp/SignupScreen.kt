@@ -188,14 +188,29 @@ fun SignupScreen(navController: NavHostController) {
                         auth.createUserWithEmailAndPassword(email, password)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    // Show Toast message for successful signup
-                                    Toast.makeText(context, "User created successfully", Toast.LENGTH_SHORT).show()
-
-                                    // Navigate to the login screen after a successful signup
-                                    navController.navigate("login")
+                                    val user = auth.currentUser
+                                    user?.sendEmailVerification()?.addOnCompleteListener { verifyTask ->
+                                        if (verifyTask.isSuccessful) {
+                                            Toast.makeText(context, "Verification email sent. Please check your email.", Toast.LENGTH_LONG).show()
+                                            navController.navigate("login") // Redirect to login for verification
+                                        } else {
+                                            Toast.makeText(context, "Failed to send verification email: ${verifyTask.exception?.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
                                 } else {
-                                    // Show error message if signup fails
-                                    Toast.makeText(context, "Signup failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                                    val errorMessage = when (task.exception?.message) {
+                                        "The email address is already in use by another account." ->
+                                            "This email is already registered. Try logging in instead."
+                                        "A network error (such as timeout, interrupted connection, or unreachable host) has occurred." ->
+                                            "Network error. Please check your internet connection and try again."
+                                        "The given password is invalid. [ PASSWORD_DOES_NOT_MEET_REQUIREMENTS:Missing password requirements: [Password must contain an upper case character, Password must contain a numeric character] ]" ->
+                                            "Password must have at least one uppercase letter and one number."
+                                        "We have blocked all requests from this device due to unusual activity. Try again later." ->
+                                            "Too many signup attempts. Please wait and try again later."
+                                        else -> "Signup failed: ${task.exception?.message ?: "Unknown error occurred."}"
+                                    }
+
+                                    Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                                 }
                             }
                     } else {
