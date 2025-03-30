@@ -64,40 +64,46 @@ fun LoginScreen(navController: NavHostController) {
 
     // Set up Google Sign-In
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestIdToken("1:715719013362:android:4bd51156cfa9a48509716b")
+        .requestIdToken("715719013362-or3qte6vttfdkk5omfcgr50bjni6dq7j.apps.googleusercontent.com")
         .requestEmail()
         .build()
 
     val googleSignInClient = GoogleSignIn.getClient(context, gso)
 
-    // ActivityResultLauncher to handle Google Sign-In result
     val signInLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == android.app.Activity.RESULT_OK) {
             val data: Intent? = result.data
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+
+            // Set navController to "opening" while processing the sign-in
+            navController.navigate("opening")
+
             try {
                 val account = task.getResult(ApiException::class.java)
                 if (account != null) {
-                    // Firebase authentication with Google credentials
                     val credential = GoogleAuthProvider.getCredential(account.idToken, null)
                     auth.signInWithCredential(credential)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                navController.navigate("opening") // Navigate to the home screen after successful sign-in
+                                val username = extractUsernameFromEmail(account.email ?: "User")
+                                navController.navigate("dashboard/$username") {
+                                    popUpTo("opening") { inclusive = true } // Remove "opening" from the stack
+                                }
                             } else {
                                 Log.w("Google Sign-In", "signInWithCredential:failure", task.exception)
                                 Toast.makeText(context, "Authentication Failed", Toast.LENGTH_SHORT).show()
+                                navController.popBackStack() // Go back if failed
                             }
                         }
                 }
             } catch (e: ApiException) {
-                Log.w("Google Sign-In", "signInWithGoogle:failure", e)
-                Toast.makeText(context, "Google Sign-In failed", Toast.LENGTH_SHORT).show()
+                Log.e("Google Sign-In", "Error Code: ${e.statusCode} - ${e.localizedMessage}")
+                Toast.makeText(context, "Google Sign-In failed: ${e.statusCode}", Toast.LENGTH_LONG).show()
+                navController.popBackStack() // Go back if exception occurs
             }
         } else {
-            // Handle sign-in failure
             Log.w("Google Sign-In", "Google sign-in failed")
         }
     }
