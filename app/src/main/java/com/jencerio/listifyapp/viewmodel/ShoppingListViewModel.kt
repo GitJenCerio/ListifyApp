@@ -33,14 +33,21 @@ class ShoppingListViewModel(private val repository: ShoppingListRepository) : Vi
 
     /** Adds a new shopping list and marks it as PENDING for sync */
     fun addShoppingList(shoppingList: ShoppingList) {
-        AuthHelper.getFirebaseToken { token ->
-            if (token != null) {
-                viewModelScope.launch {
-                    val pendingShoppingList = shoppingList.copy(syncStatus = "PENDING")
-                    repository.addShoppingList(pendingShoppingList)
-                    syncShoppingListPendingItems() // Attempt to sync immediately
-                }
-            }
+// OPTION 1:
+        //        AuthHelper.getFirebaseToken { token ->
+//            if (token != null) {
+//                viewModelScope.launch {
+//                    val pendingShoppingList = shoppingList.copy(syncStatus = "PENDING")
+//                    repository.addShoppingList(pendingShoppingList)
+//                    syncShoppingListPendingItems() // Attempt to sync immediately
+//                }
+//            }
+//
+        // OPTION 2:
+        viewModelScope.launch {
+            val pendingShoppingList = shoppingList.copy(syncStatus = "PENDING")
+            repository.addShoppingList(pendingShoppingList)
+            syncShoppingListPendingItems()
         }
     }
 
